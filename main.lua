@@ -1,5 +1,5 @@
 --[[
-    FFH4X - Painel Roblox v2.0
+    FFH4X - Painel Roblox v3.0
     Feito por Ewerton
 ]]
 
@@ -8,8 +8,10 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local Camera = workspace.CurrentCamera
+local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
 
 -- ============ LIMPAR GUI ANTIGA ============
 if CoreGui:FindFirstChild("FFH4X") then
@@ -19,12 +21,13 @@ end
 -- ============ TEXTOS POR IDIOMA ============
 local Textos = {
     pt = {
-        aim = "AIM", esp = "ESP", cfg = "CFG", info = "INFO",
+        aim = "AIM", esp = "ESP", cfg = "CFG", exploits = "HACKS", info = "INFO",
         ativarAimbot = "Ativar Aimbot",
         silentAim = "Silent Aim",
         aimVisible = "Aim Visible",
         aimTiro = "Aim Tiro",
         aimMira = "Aim Mira",
+        mostrarFov = "Mostrar FOV",
         regularFov = "Regular FOV",
         parteAimbot = "Parte do Aimbot",
         parteSilent = "Parte do Silent Aim",
@@ -33,6 +36,7 @@ local Textos = {
         espCaixa = "ESP Caixa",
         espNome = "ESP Nome",
         espDistancia = "ESP Distância",
+        espRainbow = "ESP Rainbow",
         corEsp = "Cor do ESP",
         posicaoLinha = "Posição da Linha",
         topoTela = "Topo da Tela",
@@ -44,15 +48,22 @@ local Textos = {
         rainbowOff = "DESATIVADO",
         lingua = "Língua",
         info = "INFO",
-        infoTexto = "FFH4X\nVersão: 2.0\nFeito por: Ewerton\n\nUse com responsabilidade."
+        spinbot = "Spinbot",
+        speed = "Speed",
+        fly = "Fly Mobile",
+        aimkill = "Aimkill (PERIGOSO - BAN)",
+        ghost = "Ghost",
+        teleport = "Teleport",
+        infoTexto = "FFH4X\nVersão: 3.0\nFeito por: Ewerton\n\nUse com responsabilidade."
     },
     en = {
-        aim = "AIM", esp = "ESP", cfg = "CFG", info = "INFO",
+        aim = "AIM", esp = "ESP", cfg = "CFG", exploits = "HACKS", info = "INFO",
         ativarAimbot = "Enable Aimbot",
         silentAim = "Silent Aim",
         aimVisible = "Aim Visible",
         aimTiro = "Aim Shot",
         aimMira = "Aim Scope",
+        mostrarFov = "Show FOV",
         regularFov = "Adjust FOV",
         parteAimbot = "Aimbot Part",
         parteSilent = "Silent Aim Part",
@@ -61,6 +72,7 @@ local Textos = {
         espCaixa = "ESP Box",
         espNome = "ESP Name",
         espDistancia = "ESP Distance",
+        espRainbow = "ESP Rainbow",
         corEsp = "ESP Color",
         posicaoLinha = "Line Position",
         topoTela = "Top of Screen",
@@ -72,15 +84,22 @@ local Textos = {
         rainbowOff = "DISABLED",
         lingua = "Language",
         info = "INFO",
-        infoTexto = "FFH4X\nVersion: 2.0\nMade by: Ewerton\n\nUse responsibly."
+        spinbot = "Spinbot",
+        speed = "Speed",
+        fly = "Fly Mobile",
+        aimkill = "Aimkill (DANGEROUS - BAN)",
+        ghost = "Ghost",
+        teleport = "Teleport",
+        infoTexto = "FFH4X\nVersion: 3.0\nMade by: Ewerton\n\nUse responsibly."
     },
     es = {
-        aim = "AIM", esp = "ESP", cfg = "CFG", info = "INFO",
+        aim = "AIM", esp = "ESP", cfg = "CFG", exploits = "HACKS", info = "INFO",
         ativarAimbot = "Activar Aimbot",
         silentAim = "Silent Aim",
         aimVisible = "Aim Visible",
         aimTiro = "Aim Disparo",
         aimMira = "Aim Mira",
+        mostrarFov = "Mostrar FOV",
         regularFov = "Ajustar FOV",
         parteAimbot = "Parte del Aimbot",
         parteSilent = "Parte del Silent Aim",
@@ -89,6 +108,7 @@ local Textos = {
         espCaixa = "ESP Caja",
         espNome = "ESP Nombre",
         espDistancia = "ESP Distancia",
+        espRainbow = "ESP Arcoíris",
         corEsp = "Color del ESP",
         posicaoLinha = "Posición de Línea",
         topoTela = "Parte Superior",
@@ -100,7 +120,13 @@ local Textos = {
         rainbowOff = "DESACTIVADO",
         lingua = "Idioma",
         info = "INFO",
-        infoTexto = "FFH4X\nVersión: 2.0\nHecho por: Ewerton\n\nUsar con responsabilidad."
+        spinbot = "Spinbot",
+        speed = "Speed",
+        fly = "Fly Mobile",
+        aimkill = "Aimkill (PELIGROSO - BAN)",
+        ghost = "Ghost",
+        teleport = "Teleport",
+        infoTexto = "FFH4X\nVersión: 3.0\nHecho por: Ewerton\n\nUsar con responsabilidad."
     }
 }
 
@@ -112,27 +138,34 @@ end
 
 -- ============ CONFIGURAÇÕES ============
 local Config = {
-    -- AIM
     aimbotAtivo = false,
     silentAimAtivo = false,
     aimVisible = false,
     aimTiro = false,
     aimMira = false,
+    mostrarFov = false,
     aimFov = 90,
     parteAimbot = "Head",
     parteSilent = "Head",
-    -- ESP
+
     espAtivo = false,
     espVida = false,
     espLinha = false,
     espCaixa = false,
     espNome = true,
     espDistancia = true,
+    espRainbow = false,
     corEsp = Color3.fromRGB(255, 0, 0),
     posicaoLinha = "Meio",
-    -- CFG
+
     corPainel = Color3.fromRGB(120, 0, 200),
-    rainbow = false
+    rainbow = false,
+
+    spinbot = false,
+    speed = false,
+    fly = false,
+    aimkill = false,
+    ghost = false
 }
 
 -- ============ CORES ============
@@ -235,7 +268,7 @@ menuLateral.BackgroundColor3 = Cores.roxoEscuro
 menuLateral.BorderSizePixel = 0
 menuLateral.Parent = painel
 
-local abas = {"AIM", "ESP", "CFG", "INFO"}
+local abas = {"AIM", "ESP", "HACKS", "CFG", "INFO"}
 local botoesAba = {}
 local conteudosAba = {}
 
@@ -416,7 +449,7 @@ local function criarSlider(parent, texto, posX, posY, largura, valorInicial, min
         end
     end)
 
-    return {label = label, setTexto = function(t) label.Text = t .. ": " .. math.floor(min + (max - min) * (botaoSlider.Position.X.Scale)) end}
+    return {label = label}
 end
 
 -- ============ FUNÇÃO: CRIAR DROPDOWN ============
@@ -515,6 +548,7 @@ criarCheckbox(abaAIM, T("silentAim"), 0.5, 10, 0.5, function(m) Config.silentAim
 criarCheckbox(abaAIM, T("aimVisible"), 0, 45, 0.5, function(m) Config.aimVisible = m end)
 criarCheckbox(abaAIM, T("aimTiro"), 0.5, 45, 0.5, function(m) Config.aimTiro = m end)
 criarCheckbox(abaAIM, T("aimMira"), 0, 80, 0.5, function(m) Config.aimMira = m end)
+criarCheckbox(abaAIM, T("mostrarFov"), 0.5, 80, 0.5, function(m) Config.mostrarFov = m end)
 
 criarSlider(abaAIM, "FOV", 0, 120, 1, 90, 0, 180, function(v) Config.aimFov = v end)
 
@@ -530,14 +564,15 @@ criarCheckbox(abaESP, T("espLinha"), 0, 45, 0.5, function(m) Config.espLinha = m
 criarCheckbox(abaESP, T("espCaixa"), 0.5, 45, 0.5, function(m) Config.espCaixa = m end)
 criarCheckbox(abaESP, T("espNome"), 0, 80, 0.5, function(m) Config.espNome = m end)
 criarCheckbox(abaESP, T("espDistancia"), 0.5, 80, 0.5, function(m) Config.espDistancia = m end)
+criarCheckbox(abaESP, T("espRainbow"), 0, 115, 0.5, function(m) Config.espRainbow = m end)
 
-criarDropdown(abaESP, T("posicaoLinha"), 0, 120, 0.5, {T("topoTela"), T("meioTela"), T("baixoTela")}, function(v)
+criarDropdown(abaESP, T("posicaoLinha"), 0.5, 115, 0.5, {T("topoTela"), T("meioTela"), T("baixoTela")}, function(v)
     if v == T("topoTela") then Config.posicaoLinha = "Topo"
     elseif v == T("baixoTela") then Config.posicaoLinha = "Baixo"
     else Config.posicaoLinha = "Meio" end
 end)
 
-criarDropdown(abaESP, T("corEsp"), 0.5, 120, 0.5, {"Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Rosa", "Branco"}, function(v)
+criarDropdown(abaESP, T("corEsp"), 0, 160, 0.5, {"Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Rosa", "Branco"}, function(v)
     if v == "Vermelho" then Config.corEsp = Color3.fromRGB(255, 0, 0)
     elseif v == "Verde" then Config.corEsp = Color3.fromRGB(0, 255, 0)
     elseif v == "Azul" then Config.corEsp = Color3.fromRGB(0, 150, 255)
@@ -545,6 +580,29 @@ criarDropdown(abaESP, T("corEsp"), 0.5, 120, 0.5, {"Vermelho", "Verde", "Azul", 
     elseif v == "Roxo" then Config.corEsp = Color3.fromRGB(150, 0, 255)
     elseif v == "Rosa" then Config.corEsp = Color3.fromRGB(255, 100, 200)
     elseif v == "Branco" then Config.corEsp = Color3.fromRGB(255, 255, 255) end
+end)
+
+-- ============ ABA HACKS (EXPLOITS) ============
+local abaHACKS = conteudosAba["HACKS"]
+
+criarCheckbox(abaHACKS, T("spinbot"), 0, 10, 0.5, function(m) Config.spinbot = m end)
+criarCheckbox(abaHACKS, T("speed"), 0.5, 10, 0.5, function(m) 
+    Config.speed = m
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        char.Humanoid.WalkSpeed = m and 100 or 16
+    end
+end)
+criarCheckbox(abaHACKS, T("fly"), 0, 45, 0.5, function(m) Config.fly = m end)
+criarCheckbox(abaHACKS, T("aimkill"), 0.5, 45, 0.5, function(m) Config.aimkill = m end)
+criarCheckbox(abaHACKS, T("ghost"), 0, 80, 0.5, function(m) Config.ghost = m end)
+criarCheckbox(abaHACKS, T("teleport"), 0.5, 80, 0.5, function(m) 
+    if m then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = Mouse.Hit
+        end
+    end
 end)
 
 -- ============ ABA CFG ============
@@ -564,9 +622,8 @@ criarDropdown(abaCFG, T("corPainel"), 0, 75, 1, {"Roxo", "Verde", "Azul", "Verme
     elseif v == "Laranja" then Config.corPainel = Color3.fromRGB(230, 120, 0)
     elseif v == "Rosa" then Config.corPainel = Color3.fromRGB(220, 50, 150)
     elseif v == "Ciano" then Config.corPainel = Color3.fromRGB(0, 200, 200) end
-    
-    -- Aplica a cor no painel
-        header.BackgroundColor3 = Config.corPainel
+
+    header.BackgroundColor3 = Config.corPainel
     bordaPainel.Color = Config.corPainel
 end)
 
@@ -588,7 +645,7 @@ local infoLabel = Instance.new("TextLabel")
 infoLabel.Size = UDim2.new(1, -20, 1, -20)
 infoLabel.Position = UDim2.new(0, 10, 0, 10)
 infoLabel.BackgroundTransparency = 1
-infoLabel.Text = "FFH4X\nVersão: 2.0\nFeito por: Ewerton\n\nUse com responsabilidade."
+infoLabel.Text = T("infoTexto")
 infoLabel.TextColor3 = Cores.texto
 infoLabel.TextSize = 14
 infoLabel.Font = Enum.Font.Gotham
@@ -637,7 +694,7 @@ botaoFechar.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- ============ RAINBOW ============
+-- ============ RAINBOW DO PAINEL ============
 local hue = 0
 RunService.Heartbeat:Connect(function(dt)
     if Config.rainbow then
@@ -645,11 +702,31 @@ RunService.Heartbeat:Connect(function(dt)
         local cor = Color3.fromHSV(hue, 1, 1)
         header.BackgroundColor3 = cor
         bordaPainel.Color = cor
-    else
+    elseif Config.corPainel then
         header.BackgroundColor3 = Config.corPainel
         bordaPainel.Color = Config.corPainel
     end
 end)
+
+-- ============ CÍRCULO DO FOV ============
+local fovCircle = Instance.new("Frame")
+fovCircle.Name = "FOVCircle"
+fovCircle.AnchorPoint = Vector2.new(0.5, 0.5)
+fovCircle.Position = UDim2.new(0.5, 0, 0.5, 0)
+fovCircle.BackgroundTransparency = 1
+fovCircle.Visible = false
+fovCircle.ZIndex = 2
+fovCircle.Parent = gui
+
+local fovCorner = Instance.new("UICorner")
+fovCorner.CornerRadius = UDim.new(1, 0)
+fovCorner.Parent = fovCircle
+
+local fovStroke = Instance.new("UIStroke")
+fovStroke.Color = Color3.fromRGB(255, 255, 255)
+fovStroke.Thickness = 2
+fovStroke.Transparency = 0.3
+fovStroke.Parent = fovCircle
 
 -- ============ ESP ============
 local espCache = {}
@@ -724,7 +801,7 @@ local function removerESP(jogador)
     end
 end
 
--- ============ LINHAS DO ESP ============
+-- ============ LINHAS DO ESP (ALINHADAS) ============
 local linhasCache = {}
 
 local function atualizarLinhas()
@@ -739,8 +816,8 @@ local function atualizarLinhas()
     local viewport = camera.ViewportSize
 
     local yPos = viewport.Y / 2
-    if Config.posicaoLinha == "Topo" then yPos = 50
-    elseif Config.posicaoLinha == "Baixo" then yPos = viewport.Y - 50 end
+    if Config.posicaoLinha == "Topo" then yPos = 0
+    elseif Config.posicaoLinha == "Baixo" then yPos = viewport.Y end
 
     for _, jogador in ipairs(Players:GetPlayers()) do
         if jogador ~= LocalPlayer and jogador.Character then
@@ -762,7 +839,19 @@ local function atualizarLinhas()
     end
 end
 
--- ============ AIMBOT ============
+-- ============ AIMBOT COM RAYCAST ============
+local function temParede(posOrigem, posAlvo)
+    local params = RaycastParams.new()
+    params.FilterDescendantsInstances = {LocalPlayer.Character, Camera}
+    params.FilterType = Enum.RaycastFilterType.Exclude
+
+    local resultado = workspace:Raycast(posOrigem, posAlvo - posOrigem, params)
+    if resultado then
+        return true
+    end
+    return false
+end
+
 local function pegarAlvo(parte)
     local char = LocalPlayer.Character
     if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
@@ -794,8 +883,15 @@ local function pegarAlvo(parte)
                 if onScreen then
                     local distTela = (Vector2.new(screenPos.X, screenPos.Y) - centroTela).Magnitude
                     if distTela < menorDist and distTela < maxDist * 5 then
-                        menorDist = distTela
-                        melhor = parteAlvo
+                        if Config.aimVisible then
+                            if not temParede(camera.CFrame.Position, parteAlvo.Position) then
+                                menorDist = distTela
+                                melhor = parteAlvo
+                            end
+                        else
+                            menorDist = distTela
+                            melhor = parteAlvo
+                        end
                     end
                 end
             end
@@ -805,7 +901,42 @@ local function pegarAlvo(parte)
     return melhor
 end
 
+-- ============ SILENT AIM (TENTATIVA DE HOOK) ============
+local function tentarHookSilentAim()
+    local sucesso = pcall(function()
+        if hookmetamethod and getrawmetatable and setreadonly and newcclosure then
+            local mt = getrawmetatable(game)
+            local oldNamecall = mt.__namecall
+            setreadonly(mt, false)
+            mt.__namecall = newcclosure(function(self, ...)
+                local method = getnamecallmethod()
+                if Config.silentAimAtivo and (method == "Fire" or method == "Raycast") then
+                    -- Hook real seria aqui, mas depende do executor
+                end
+                return oldNamecall(self, ...)
+            end)
+            setreadonly(mt, true)
+            return true
+        end
+        return false
+    end)
+    return sucesso
+end
+
+local hookOk = tentarHookSilentAim()
+if not hookOk then
+    print("[FFH4X] Silent Aim: hooks nao suportados neste executor. Apenas Aimbot visual ativo.")
+end
+
+-- ============ LOOP AIMBOT ============
 RunService.RenderStepped:Connect(function()
+    if Config.mostrarFov then
+        fovCircle.Visible = true
+        fovCircle.Size = UDim2.new(0, Config.aimFov * 10, 0, Config.aimFov * 10)
+    else
+        fovCircle.Visible = false
+    end
+
     if Config.aimbotAtivo then
         local alvo = pegarAlvo(Config.parteAimbot)
         if alvo then
@@ -815,8 +946,14 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- ============ LOOP PRINCIPAL DO ESP ============
+-- ============ LOOP ESP ============
 RunService.RenderStepped:Connect(function()
+    local corAtual = Config.corEsp
+    if Config.espRainbow then
+        local h = (tick() * 0.5) % 1
+        corAtual = Color3.fromHSV(h, 1, 1)
+    end
+
     if Config.espAtivo then
         for _, jogador in ipairs(Players:GetPlayers()) do
             if jogador ~= LocalPlayer and jogador.Character and jogador.Character:FindFirstChild("HumanoidRootPart") then
@@ -827,11 +964,11 @@ RunService.RenderStepped:Connect(function()
                 local cache = espCache[jogador]
                 if cache then
                     cache.highlight.Adornee = jogador.Character
-                    cache.highlight.FillColor = Config.corEsp
-                    cache.highlight.OutlineColor = Config.corEsp
+                    cache.highlight.FillColor = corAtual
+                    cache.highlight.OutlineColor = corAtual
                     cache.billboard.Adornee = jogador.Character:FindFirstChild("Head")
                     cache.nome.Visible = Config.espNome
-                    cache.nome.TextColor3 = Config.corEsp
+                    cache.nome.TextColor3 = corAtual
                     cache.distancia.Visible = Config.espDistancia
                     cache.vida.Visible = Config.espVida
 
@@ -860,8 +997,86 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
+-- ============ HACKS: SPINBOT ============
+RunService.Heartbeat:Connect(function()
+    if Config.spinbot then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(30), 0)
+        end
+    end
+end)
+
+-- ============ HACKS: FLY MOBILE ============
+local flyVelocidade = 1
+
+RunService.RenderStepped:Connect(function()
+    if Config.fly then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            local hrp = char.HumanoidRootPart
+            local camera = workspace.CurrentCamera
+
+            local direcao = Vector3.new(0, 0, 0)
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then direcao = direcao + camera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then direcao = direcao - camera.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then direcao = direcao - camera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then direcao = direcao + camera.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then direcao = direcao + Vector3.new(0, 1, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then direcao = direcao - Vector3.new(0, 1, 0) end
+
+            if direcao.Magnitude > 0 then
+                direcao = direcao.Unit * 50 * flyVelocidade
+            end
+
+            hrp.Velocity = direcao
+        end
+    end
+end)
+
+-- ============ HACKS: AIMKILL ============
+RunService.Heartbeat:Connect(function()
+    if Config.aimkill then
+        local char = LocalPlayer.Character
+        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+
+        local minhaPos = char.HumanoidRootPart.Position
+
+        for _, jogador in ipairs(Players:GetPlayers()) do
+            if jogador ~= LocalPlayer and jogador.Character then
+                local hum = jogador.Character:FindFirstChild("Humanoid")
+                local hrp = jogador.Character:FindFirstChild("HumanoidRootPart")
+
+                if hum and hrp then
+                    local dist = (hrp.Position - minhaPos).Magnitude
+                    if dist < 20 then
+                        hum.Health = 0
+                    end
+                end
+            end
+        end
+    end
+end)
+
+-- ============ HACKS: GHOST ============
+local ghostPosicao = nil
+
+RunService.Heartbeat:Connect(function()
+    if Config.ghost then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            if not ghostPosicao then
+                ghostPosicao = char.HumanoidRootPart.CFrame
+            end
+        end
+    else
+        ghostPosicao = nil
+    end
+end)
+
+-- ============ PLAYER REMOVING ============
 Players.PlayerRemoving:Connect(function(jogador)
     removerESP(jogador)
 end)
 
-print("[FFH4X] v2.0 carregado! Feito por Ewerton")
+print("[FFH4X] v3.0 carregado! Feito por Ewerton")
