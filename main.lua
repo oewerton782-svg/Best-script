@@ -1,5 +1,5 @@
 --[[
-    Best Script GUI v1.1
+    Best Script GUI v1.2
     Feito por Ewerton
 ]]
 
@@ -58,16 +58,23 @@ local FuncoesUniversais = {
     end}}
 }
 
--- Limpa GUI antiga
+-- ============ LIMPAR GUI ANTIGA ============
 if CoreGui:FindFirstChild("BestScriptGui") then
     CoreGui.BestScriptGui:Destroy()
 end
 
--- ============ GUI ============
+-- ============ VARIÁVEIS DE ESTADO ============
+local arrastando = false
+local arrastandoSlider = false
+local offsetInicial = nil
+local painelAberto = false
+
+-- ============ GUI PRINCIPAL ============
 local gui = Instance.new("ScreenGui")
 gui.Name = "BestScriptGui"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = CoreGui
 
 local container = Instance.new("Frame")
@@ -77,6 +84,10 @@ container.Position = UDim2.new(0.5, 0, 0.5, 0)
 container.AnchorPoint = Vector2.new(0.5, 0.5)
 container.BackgroundTransparency = 1
 container.Parent = gui
+
+local uiScale = Instance.new("UIScale")
+uiScale.Scale = 1
+uiScale.Parent = container
 
 local fundo = Instance.new("Frame")
 fundo.Name = "Fundo"
@@ -96,10 +107,11 @@ bordaFundo.Thickness = 2
 bordaFundo.Transparency = 0.3
 bordaFundo.Parent = fundo
 
--- Barra de título
+-- ============ BARRA DE TÍTULO ============
 local barraTitulo = Instance.new("Frame")
 barraTitulo.Name = "BarraTitulo"
 barraTitulo.Size = UDim2.new(1, 0, 0, 50)
+barraTitulo.Position = UDim2.new(0, 0, 0, 0)
 barraTitulo.BackgroundColor3 = Color3.fromRGB(0, 200, 120)
 barraTitulo.BackgroundTransparency = 0.15
 barraTitulo.BorderSizePixel = 0
@@ -110,6 +122,7 @@ cantoBarra.CornerRadius = UDim.new(0, 12)
 cantoBarra.Parent = barraTitulo
 
 local titulo = Instance.new("TextLabel")
+titulo.Name = "Titulo"
 titulo.Size = UDim2.new(0.7, 0, 1, 0)
 titulo.Position = UDim2.new(0.05, 0, 0, 0)
 titulo.BackgroundTransparency = 1
@@ -121,6 +134,7 @@ titulo.TextXAlignment = Enum.TextXAlignment.Left
 titulo.Parent = barraTitulo
 
 local botaoFechar = Instance.new("TextButton")
+botaoFechar.Name = "BotaoFechar"
 botaoFechar.Size = UDim2.new(0, 30, 0, 30)
 botaoFechar.Position = UDim2.new(1, -40, 0, 10)
 botaoFechar.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
@@ -136,6 +150,7 @@ cantoFechar.CornerRadius = UDim.new(1, 0)
 cantoFechar.Parent = botaoFechar
 
 local autor = Instance.new("TextLabel")
+autor.Name = "Autor"
 autor.Size = UDim2.new(1, 0, 0, 25)
 autor.Position = UDim2.new(0, 0, 0, 55)
 autor.BackgroundTransparency = 1
@@ -147,9 +162,11 @@ autor.Parent = fundo
 
 -- ============ MENU PRINCIPAL ============
 local menuPrincipal = Instance.new("Frame")
+menuPrincipal.Name = "MenuPrincipal"
 menuPrincipal.Size = UDim2.new(1, -40, 1, -110)
 menuPrincipal.Position = UDim2.new(0, 20, 0, 95)
 menuPrincipal.BackgroundTransparency = 1
+menuPrincipal.Visible = true
 menuPrincipal.Parent = fundo
 
 local botoesInfo = {
@@ -162,6 +179,7 @@ local botoes = {}
 
 for i, info in ipairs(botoesInfo) do
     local botao = Instance.new("TextButton")
+    botao.Name = "Botao_" .. info.nome
     botao.Size = UDim2.new(1, 0, 0, 50)
     botao.Position = UDim2.new(0, 0, 0, (i - 1) * 60)
     botao.BackgroundColor3 = info.cor
@@ -197,6 +215,7 @@ end
 
 -- ============ MENU JOGAR ============
 local menuJogar = Instance.new("Frame")
+menuJogar.Name = "MenuJogar"
 menuJogar.Size = UDim2.new(1, -40, 1, -110)
 menuJogar.Position = UDim2.new(0, 20, 0, 95)
 menuJogar.BackgroundTransparency = 1
@@ -204,6 +223,7 @@ menuJogar.Visible = false
 menuJogar.Parent = fundo
 
 local labelJogoDetectado = Instance.new("TextLabel")
+labelJogoDetectado.Name = "LabelJogo"
 labelJogoDetectado.Size = UDim2.new(1, 0, 0, 25)
 labelJogoDetectado.Position = UDim2.new(0, 0, 0, 0)
 labelJogoDetectado.BackgroundTransparency = 1
@@ -215,6 +235,7 @@ labelJogoDetectado.TextXAlignment = Enum.TextXAlignment.Left
 labelJogoDetectado.Parent = menuJogar
 
 local scrollFuncoes = Instance.new("ScrollingFrame")
+scrollFuncoes.Name = "ScrollFuncoes"
 scrollFuncoes.Size = UDim2.new(1, 0, 1, -80)
 scrollFuncoes.Position = UDim2.new(0, 0, 0, 35)
 scrollFuncoes.BackgroundTransparency = 1
@@ -230,6 +251,7 @@ layoutFuncoes.Padding = UDim.new(0, 8)
 layoutFuncoes.Parent = scrollFuncoes
 
 local botaoVoltarJogar = Instance.new("TextButton")
+botaoVoltarJogar.Name = "BotaoVoltarJogar"
 botaoVoltarJogar.Size = UDim2.new(1, 0, 0, 40)
 botaoVoltarJogar.Position = UDim2.new(0, 0, 1, -40)
 botaoVoltarJogar.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
@@ -247,6 +269,7 @@ cantoVoltarJogar.Parent = botaoVoltarJogar
 -- ============ FUNÇÕES ============
 local function criarBotaoFuncao(info, index)
     local botao = Instance.new("TextButton")
+    botao.Name = "Funcao_" .. index
     botao.Size = UDim2.new(1, 0, 0, 45)
     botao.BackgroundColor3 = Color3.fromRGB(0, 180, 120)
     botao.BackgroundTransparency = 0.15
@@ -268,6 +291,14 @@ local function criarBotaoFuncao(info, index)
     stroke.Thickness = 1
     stroke.Transparency = 0.7
     stroke.Parent = botao
+
+    botao.MouseEnter:Connect(function()
+        TweenService:Create(botao, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
+    end)
+
+    botao.MouseLeave:Connect(function()
+        TweenService:Create(botao, TweenInfo.new(0.15), {BackgroundTransparency = 0.15}):Play()
+    end)
 
     botao.MouseButton1Click:Connect(function()
         local sucesso, erro = pcall(info.acao)
@@ -329,12 +360,7 @@ local function mostrarJogar()
     }):Play()
 end
 
--- ============ EVENTOS ============
-botoes[1].MouseButton1Click:Connect(mostrarJogar)
-botoes[2].MouseButton1Click:Connect(function()
-    print("[Best Script] Config clicado")
-end)
-
+-- ============ FECHAR GUI ============
 local function fecharGui()
     TweenService:Create(container, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
         Position = UDim2.new(0.5, 0, 1.5, 0)
@@ -343,14 +369,16 @@ local function fecharGui()
     gui:Destroy()
 end
 
+-- ============ EVENTOS DOS BOTÕES ============
+botoes[1].MouseButton1Click:Connect(mostrarJogar)
+botoes[2].MouseButton1Click:Connect(function()
+    print("[Best Script] Config clicado")
+end)
 botoes[3].MouseButton1Click:Connect(fecharGui)
 botaoFechar.MouseButton1Click:Connect(fecharGui)
 botaoVoltarJogar.MouseButton1Click:Connect(mostrarPrincipal)
 
--- Arrastar
-local arrastando = false
-local offsetInicial
-
+-- ============ ARRASTAR JANELA ============
 barraTitulo.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         arrastando = true
@@ -365,8 +393,10 @@ UserInputService.InputEnded:Connect(function(input)
 end)
 
 UserInputService.InputChanged:Connect(function(input)
-    if arrastando and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        container.Position = UDim2.new(0, input.Position.X - offsetInicial.X, 0, input.Position.Y - offsetInicial.Y)
+    if arrastando and offsetInicial then
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            container.Position = UDim2.new(0, input.Position.X - offsetInicial.X, 0, input.Position.Y - offsetInicial.Y)
+        end
     end
 end)
 
@@ -408,4 +438,4 @@ for _, b in ipairs(botoes) do
     task.wait(0.08)
 end
 
-print("[Best Script] GUI v1.1 carregada! Jogo: " .. game.PlaceId)
+print("[Best Script] GUI v1.2 carregada! Jogo: " .. game.PlaceId)
