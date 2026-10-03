@@ -3,6 +3,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
 
 local LocalPlayer = Players.LocalPlayer
@@ -14,14 +15,17 @@ end
 
 local Textos = {
     pt = {
-        aim = "AIM", esp = "ESP", cfg = "CFG", exploits = "HACKS", info = "INFO",
+        aim = "AIM", esp = "ESP", move = "MOVE", char = "CHAR", visual = "VISUAL", cfg = "CFG", info = "INFO",
         ativarAimbot = "Ativar Aimbot",
         silentAim = "Silent Aim",
         aimVisible = "Aim Visible",
-        aimTiro = "Aim Tiro",
-        aimMira = "Aim Mira",
+        aimSmooth = "Aim Smooth",
+        aimPrediction = "Aim Prediction",
+        triggerBot = "Trigger Bot",
+        noRecoil = "No Recoil",
+        teamCheck = "Team Check",
         mostrarFov = "Mostrar FOV",
-        autoShoot = "Auto Shoot (PERIGOSO)",
+        autoShoot = "Auto Shoot",
         regularFov = "Regular FOV",
         parteAimbot = "Parte do Aimbot",
         parteSilent = "Parte do Silent Aim",
@@ -31,19 +35,17 @@ local Textos = {
         espNome = "ESP Nome",
         espDistancia = "ESP Distância",
         espRainbow = "ESP Rainbow",
+        espTracer = "ESP Tracer",
+        espHealthBar = "ESP Health Bar",
         corEsp = "Cor do ESP",
         posicaoLinha = "Posição da Linha",
-        topoTela = "Topo",
-        meioTela = "Meio",
-        baixoTela = "Baixo",
+        topoTela = "Topo", meioTela = "Meio", baixoTela = "Baixo",
         corPainel = "Cor do Painel",
         rainbow = "Modo Rainbow",
-        rainbowOn = "ATIVADO",
-        rainbowOff = "DESATIVADO",
         lingua = "Língua",
-        spinbot = "Spinbot",
         speed = "Speed",
         fly = "Fly Mobile",
+        spinbot = "Spinbot",
         ghost = "Ghost",
         teleport = "Teleport",
         fullbright = "Fullbright",
@@ -51,87 +53,71 @@ local Textos = {
         infinitejump = "Infinite Jump",
         antiafk = "Anti-AFK",
         waterwalk = "Walk on Water",
-        infoTexto = "FFH4X v6.0\nFeito por: Ewerton\n\nUse com responsabilidade."
+        noclip = "Noclip",
+        superjump = "Super Jump",
+        longjump = "Long Jump",
+        bunnyhop = "Bunny Hop",
+        gravity = "Gravity Control",
+        teleportplayer = "Teleport to Player",
+        savepos = "Save Position",
+        loadpos = "Load Position",
+        autorespawn = "Auto Respawn",
+        hitbox = "Hitbox Expander",
+        charsise = "Character Size",
+        headless = "Headless",
+        fpsboost = "FPS Boost",
+        timeofday = "Time of Day",
+        noparticles = "No Particles",
+        notifications = "Notificações",
+        watermark = "Watermark",
+        sair = "Sair",
+        infoTexto = "FFH4X v7.0\nFeito por: Ewerton\n\nUse com responsabilidade."
     },
     en = {
-        aim = "AIM", esp = "ESP", cfg = "CFG", exploits = "HACKS", info = "INFO",
-        ativarAimbot = "Enable Aimbot",
-        silentAim = "Silent Aim",
-        aimVisible = "Aim Visible",
-        aimTiro = "Aim Shot",
-        aimMira = "Aim Scope",
-        mostrarFov = "Show FOV",
-        autoShoot = "Auto Shoot (DANGEROUS)",
-        regularFov = "Adjust FOV",
-        parteAimbot = "Aimbot Part",
-        parteSilent = "Silent Aim Part",
-        espVida = "ESP Health",
-        espLinha = "ESP Line",
-        espCaixa = "ESP Box",
-        espNome = "ESP Name",
-        espDistancia = "ESP Distance",
-        espRainbow = "ESP Rainbow",
-        corEsp = "ESP Color",
-        posicaoLinha = "Line Position",
-        topoTela = "Top",
-        meioTela = "Middle",
-        baixoTela = "Bottom",
-        corPainel = "Panel Color",
-        rainbow = "Rainbow Mode",
-        rainbowOn = "ENABLED",
-        rainbowOff = "DISABLED",
-        lingua = "Language",
-        spinbot = "Spinbot",
-        speed = "Speed",
-        fly = "Fly Mobile",
-        ghost = "Ghost",
-        teleport = "Teleport",
-        fullbright = "Fullbright",
-        nofog = "No Fog",
-        infinitejump = "Infinite Jump",
-        antiafk = "Anti-AFK",
-        waterwalk = "Walk on Water",
-        infoTexto = "FFH4X v6.0\nMade by: Ewerton\n\nUse responsibly."
+        aim = "AIM", esp = "ESP", move = "MOVE", char = "CHAR", visual = "VISUAL", cfg = "CFG", info = "INFO",
+        ativarAimbot = "Enable Aimbot", silentAim = "Silent Aim", aimVisible = "Aim Visible",
+        aimSmooth = "Aim Smooth", aimPrediction = "Aim Prediction", triggerBot = "Trigger Bot",
+        noRecoil = "No Recoil", teamCheck = "Team Check", mostrarFov = "Show FOV",
+        autoShoot = "Auto Shoot", regularFov = "Adjust FOV",
+        parteAimbot = "Aimbot Part", parteSilent = "Silent Aim Part",
+        espVida = "ESP Health", espLinha = "ESP Line", espCaixa = "ESP Box",
+        espNome = "ESP Name", espDistancia = "ESP Distance", espRainbow = "ESP Rainbow",
+        espTracer = "ESP Tracer", espHealthBar = "ESP Health Bar", corEsp = "ESP Color",
+        posicaoLinha = "Line Position", topoTela = "Top", meioTela = "Middle", baixoTela = "Bottom",
+        corPainel = "Panel Color", rainbow = "Rainbow Mode", lingua = "Language",
+        speed = "Speed", fly = "Fly Mobile", spinbot = "Spinbot", ghost = "Ghost",
+        teleport = "Teleport", fullbright = "Fullbright", nofog = "No Fog",
+        infinitejump = "Infinite Jump", antiafk = "Anti-AFK", waterwalk = "Walk on Water",
+        noclip = "Noclip", superjump = "Super Jump", longjump = "Long Jump",
+        bunnyhop = "Bunny Hop", gravity = "Gravity Control", teleportplayer = "Teleport to Player",
+        savepos = "Save Position", loadpos = "Load Position", autorespawn = "Auto Respawn",
+        hitbox = "Hitbox Expander", charsise = "Character Size", headless = "Headless",
+        fpsboost = "FPS Boost", timeofday = "Time of Day", noparticles = "No Particles",
+        notifications = "Notifications", watermark = "Watermark", sair = "Exit",
+        infoTexto = "FFH4X v7.0\nMade by: Ewerton\n\nUse responsibly."
     },
     es = {
-        aim = "AIM", esp = "ESP", cfg = "CFG", exploits = "HACKS", info = "INFO",
-        ativarAimbot = "Activar Aimbot",
-        silentAim = "Silent Aim",
-        aimVisible = "Aim Visible",
-        aimTiro = "Aim Disparo",
-        aimMira = "Aim Mira",
-        mostrarFov = "Mostrar FOV",
-        autoShoot = "Auto Shoot (PELIGROSO)",
-        regularFov = "Ajustar FOV",
-        parteAimbot = "Parte del Aimbot",
-        parteSilent = "Parte del Silent Aim",
-        espVida = "ESP Vida",
-        espLinha = "ESP Línea",
-        espCaixa = "ESP Caja",
-        espNome = "ESP Nombre",
-        espDistancia = "ESP Distancia",
-        espRainbow = "ESP Arcoíris",
-        corEsp = "Color del ESP",
-        posicaoLinha = "Posición de Línea",
-        topoTela = "Superior",
-        meioTela = "Centro",
-        baixoTela = "Inferior",
-        corPainel = "Color del Panel",
-        rainbow = "Modo Arcoíris",
-        rainbowOn = "ACTIVADO",
-        rainbowOff = "DESACTIVADO",
-        lingua = "Idioma",
-        spinbot = "Spinbot",
-        speed = "Speed",
-        fly = "Fly Mobile",
-        ghost = "Ghost",
-        teleport = "Teleport",
-        fullbright = "Fullbright",
-        nofog = "No Fog",
-        infinitejump = "Infinite Jump",
-        antiafk = "Anti-AFK",
-        waterwalk = "Walk on Water",
-        infoTexto = "FFH4X v6.0\nHecho por: Ewerton\n\nUsar con responsabilidad."
+        aim = "AIM", esp = "ESP", move = "MOVE", char = "CHAR", visual = "VISUAL", cfg = "CFG", info = "INFO",
+        ativarAimbot = "Activar Aimbot", silentAim = "Silent Aim", aimVisible = "Aim Visible",
+        aimSmooth = "Aim Smooth", aimPrediction = "Aim Prediction", triggerBot = "Trigger Bot",
+        noRecoil = "No Recoil", teamCheck = "Team Check", mostrarFov = "Mostrar FOV",
+        autoShoot = "Auto Shoot", regularFov = "Ajustar FOV",
+        parteAimbot = "Parte del Aimbot", parteSilent = "Parte del Silent Aim",
+        espVida = "ESP Vida", espLinha = "ESP Línea", espCaixa = "ESP Caja",
+        espNome = "ESP Nombre", espDistancia = "ESP Distancia", espRainbow = "ESP Arcoíris",
+        espTracer = "ESP Tracer", espHealthBar = "ESP Health Bar", corEsp = "Color del ESP",
+        posicaoLinha = "Posición de Línea", topoTela = "Superior", meioTela = "Centro", baixoTela = "Inferior",
+        corPainel = "Color del Panel", rainbow = "Modo Arcoíris", lingua = "Idioma",
+        speed = "Speed", fly = "Fly Mobile", spinbot = "Spinbot", ghost = "Ghost",
+        teleport = "Teleport", fullbright = "Fullbright", nofog = "No Fog",
+        infinitejump = "Infinite Jump", antiafk = "Anti-AFK", waterwalk = "Walk on Water",
+        noclip = "Noclip", superjump = "Super Jump", longjump = "Long Jump",
+        bunnyhop = "Bunny Hop", gravity = "Gravity Control", teleportplayer = "Teleport to Player",
+        savepos = "Save Position", loadpos = "Load Position", autorespawn = "Auto Respawn",
+        hitbox = "Hitbox Expander", charsise = "Tamaño del Personaje", headless = "Headless",
+        fpsboost = "FPS Boost", timeofday = "Hora del Día", noparticles = "No Particles",
+        notifications = "Notificaciones", watermark = "Watermark", sair = "Salir",
+        infoTexto = "FFH4X v7.0\nHecho por: Ewerton\n\nUsar con responsabilidad."
     }
 }
 
@@ -142,47 +128,43 @@ local function T(chave)
 end
 
 local Config = {
-    aimbotAtivo = false,
-    silentAimAtivo = false,
-    aimVisible = false,
-    aimTiro = false,
-    aimMira = false,
-    mostrarFov = false,
-    autoShoot = false,
-    aimFov = 90,
-    parteAimbot = "Head",
-    parteSilent = "Head",
-    espAtivo = false,
-    espVida = false,
-    espLinha = false,
-    espCaixa = false,
-    espNome = true,
-    espDistancia = true,
-    espRainbow = false,
-    corEsp = Color3.fromRGB(255, 0, 0),
-    posicaoLinha = "Meio",
-    corPainel = Color3.fromRGB(120, 0, 200),
-    rainbow = false,
-    spinbot = false,
-    speed = false,
-    fly = false,
-    ghost = false,
-    fullbright = false,
-    nofog = false,
-    infinitejump = false,
-    antiafk = false,
-    waterwalk = false
+    aimbotAtivo = false, silentAimAtivo = false, aimVisible = false,
+    aimSmooth = 0.15, aimPrediction = false, triggerBot = false, noRecoil = false,
+    teamCheck = true, mostrarFov = false, autoShoot = false,
+    aimFov = 90, parteAimbot = "Head", parteSilent = "Head",
+
+    espAtivo = false, espVida = false, espLinha = false, espCaixa = false,
+    espNome = true, espDistancia = true, espRainbow = false,
+    espTracer = false, espHealthBar = false,
+    corEsp = Color3.fromRGB(255, 0, 0), posicaoLinha = "Meio",
+    espDistanciaMax = 500,
+
+    speed = false, fly = false, spinbot = false, ghost = false,
+    teleportAtivo = false, fullbright = false, nofog = false,
+    infinitejump = false, antiafk = false, waterwalk = false,
+    noclip = false, superjump = false, longjump = false, bunnyhop = false,
+    gravityAtivo = false, gravityValor = 196,
+    teleportPlayerAtivo = false, autorespawn = false,
+
+    hitbox = false, hitboxSize = 5, charSize = 1, headless = false,
+
+    fpsboost = false, timeofday = false, timeofdayValor = 12, noparticles = false,
+
+    corPainel = Color3.fromRGB(120, 0, 200), rainbow = false,
+    notificacoes = true, watermark = true, som = true
 }
 
 local Cores = {
     roxo = Config.corPainel,
-    roxoEscuro = Color3.fromRGB(40, 5, 70),
+    roxoEscuro = Color3.fromRGB(20, 5, 35),
+    roxoMedio = Color3.fromRGB(40, 5, 70),
     roxoClaro = Color3.fromRGB(160, 60, 220),
-    fundo = Color3.fromRGB(25, 5, 45),
-    fundoAba = Color3.fromRGB(45, 10, 75),
+    fundo = Color3.fromRGB(18, 5, 32),
+    fundoAba = Color3.fromRGB(35, 8, 60),
     texto = Color3.fromRGB(255, 255, 255),
     cinza = Color3.fromRGB(180, 180, 180),
-    verde = Color3.fromRGB(0, 200, 0)
+    verde = Color3.fromRGB(0, 220, 100),
+    vermelho = Color3.fromRGB(220, 50, 50)
 }
 
 local gui = Instance.new("ScreenGui")
@@ -194,8 +176,8 @@ gui.Parent = CoreGui
 
 local painel = Instance.new("Frame")
 painel.Name = "Painel"
-painel.Size = UDim2.new(0, 520, 0, 380)
-painel.Position = UDim2.new(0.5, -260, 0.5, -190)
+painel.Size = UDim2.new(0, 560, 0, 400)
+painel.Position = UDim2.new(0.5, -280, 0.5, -200)
 painel.BackgroundColor3 = Cores.fundo
 painel.BorderSizePixel = 0
 painel.Active = true
@@ -203,7 +185,7 @@ painel.Draggable = true
 painel.Parent = gui
 
 local cantoPainel = Instance.new("UICorner")
-cantoPainel.CornerRadius = UDim.new(0, 8)
+cantoPainel.CornerRadius = UDim.new(0, 10)
 cantoPainel.Parent = painel
 
 local bordaPainel = Instance.new("UIStroke")
@@ -211,83 +193,103 @@ bordaPainel.Color = Cores.roxo
 bordaPainel.Thickness = 2
 bordaPainel.Parent = painel
 
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 8, 55)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 3, 25))
+}
+gradient.Rotation = 90
+gradient.Parent = painel
+
 local header = Instance.new("Frame")
 header.Name = "Header"
-header.Size = UDim2.new(1, 0, 0, 30)
+header.Size = UDim2.new(1, 0, 0, 34)
 header.BackgroundColor3 = Cores.roxo
 header.BorderSizePixel = 0
 header.Parent = painel
 
 local cantoHeader = Instance.new("UICorner")
-cantoHeader.CornerRadius = UDim.new(0, 8)
+cantoHeader.CornerRadius = UDim.new(0, 10)
 cantoHeader.Parent = header
 
 local botaoMinimizar = Instance.new("TextButton")
-botaoMinimizar.Size = UDim2.new(0, 25, 0, 25)
-botaoMinimizar.Position = UDim2.new(0, 5, 0, 2)
-botaoMinimizar.BackgroundTransparency = 1
-botaoMinimizar.Text = "▼"
+botaoMinimizar.Size = UDim2.new(0, 26, 0, 26)
+botaoMinimizar.Position = UDim2.new(0, 6, 0, 4)
+botaoMinimizar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+botaoMinimizar.BackgroundTransparency = 0.9
+botaoMinimizar.BorderSizePixel = 0
+botaoMinimizar.Text = "−"
 botaoMinimizar.TextColor3 = Cores.texto
-botaoMinimizar.TextSize = 14
+botaoMinimizar.TextSize = 16
 botaoMinimizar.Font = Enum.Font.GothamBold
 botaoMinimizar.Parent = header
 
+local cantoMin = Instance.new("UICorner")
+cantoMin.CornerRadius = UDim.new(1, 0)
+cantoMin.Parent = botaoMinimizar
+
 local tituloHeader = Instance.new("TextLabel")
-tituloHeader.Size = UDim2.new(0.5, 0, 1, 0)
-tituloHeader.Position = UDim2.new(0.25, 0, 0, 0)
+tituloHeader.Size = UDim2.new(0.4, 0, 1, 0)
+tituloHeader.Position = UDim2.new(0.3, 0, 0, 0)
 tituloHeader.BackgroundTransparency = 1
 tituloHeader.Text = "FFH4X"
 tituloHeader.TextColor3 = Cores.texto
-tituloHeader.TextSize = 16
+tituloHeader.TextSize = 17
 tituloHeader.Font = Enum.Font.GothamBold
 tituloHeader.Parent = header
 
 local autorHeader = Instance.new("TextLabel")
 autorHeader.Size = UDim2.new(0.3, 0, 1, 0)
-autorHeader.Position = UDim2.new(0.6, 0, 0, 0)
+autorHeader.Position = UDim2.new(0.65, 0, 0, 0)
 autorHeader.BackgroundTransparency = 1
 autorHeader.Text = "Feito por Ewerton"
-autorHeader.TextColor3 = Cores.cinza
+autorHeader.TextColor3 = Color3.fromRGB(230, 200, 255)
 autorHeader.TextSize = 11
 autorHeader.Font = Enum.Font.Gotham
 autorHeader.TextXAlignment = Enum.TextXAlignment.Right
 autorHeader.Parent = header
 
 local botaoFechar = Instance.new("TextButton")
-botaoFechar.Size = UDim2.new(0, 25, 0, 25)
-botaoFechar.Position = UDim2.new(1, -30, 0, 2)
-botaoFechar.BackgroundTransparency = 1
+botaoFechar.Size = UDim2.new(0, 26, 0, 26)
+botaoFechar.Position = UDim2.new(1, -32, 0, 4)
+botaoFechar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+botaoFechar.BackgroundTransparency = 0.9
+botaoFechar.BorderSizePixel = 0
 botaoFechar.Text = "X"
 botaoFechar.TextColor3 = Cores.texto
 botaoFechar.TextSize = 14
 botaoFechar.Font = Enum.Font.GothamBold
 botaoFechar.Parent = header
 
+local cantoFechar = Instance.new("UICorner")
+cantoFechar.CornerRadius = UDim.new(1, 0)
+cantoFechar.Parent = botaoFechar
+
 local menuLateral = Instance.new("Frame")
 menuLateral.Name = "MenuLateral"
-menuLateral.Size = UDim2.new(0, 80, 1, -30)
-menuLateral.Position = UDim2.new(0, 0, 0, 30)
+menuLateral.Size = UDim2.new(0, 90, 1, -34)
+menuLateral.Position = UDim2.new(0, 0, 0, 34)
 menuLateral.BackgroundColor3 = Cores.roxoEscuro
 menuLateral.BorderSizePixel = 0
 menuLateral.Parent = painel
 
-local abas = {"AIM", "ESP", "HACKS", "CFG", "INFO"}
+local abas = {"AIM", "ESP", "MOVE", "CHAR", "VISUAL", "CFG", "INFO"}
 local botoesAba = {}
 local conteudosAba = {}
 
 local areaConteudo = Instance.new("Frame")
-areaConteudo.Size = UDim2.new(1, -80, 1, -30)
-areaConteudo.Position = UDim2.new(0, 80, 0, 30)
+areaConteudo.Size = UDim2.new(1, -90, 1, -34)
+areaConteudo.Position = UDim2.new(0, 90, 0, 34)
 areaConteudo.BackgroundTransparency = 1
 areaConteudo.Parent = painel
 
 for i, nomeAba in ipairs(abas) do
     local botao = Instance.new("TextButton")
     botao.Name = "Aba_" .. nomeAba
-    botao.Size = UDim2.new(1, 0, 0, 40)
-    botao.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
+    botao.Size = UDim2.new(1, 0, 0, 42)
+    botao.Position = UDim2.new(0, 0, 0, (i - 1) * 42)
     botao.BackgroundColor3 = Cores.fundoAba
-    botao.BackgroundTransparency = 0.3
+    botao.BackgroundTransparency = 0.4
     botao.BorderSizePixel = 0
     botao.Text = nomeAba
     botao.TextColor3 = Cores.texto
@@ -297,10 +299,18 @@ for i, nomeAba in ipairs(abas) do
     botao.Parent = menuLateral
     botoesAba[nomeAba] = botao
 
-    local conteudo = Instance.new("Frame")
+    local cantoA = Instance.new("UICorner")
+    cantoA.CornerRadius = UDim.new(0, 6)
+    cantoA.Parent = botao
+
+    local conteudo = Instance.new("ScrollingFrame")
     conteudo.Name = "Conteudo_" .. nomeAba
     conteudo.Size = UDim2.new(1, 0, 1, 0)
     conteudo.BackgroundTransparency = 1
+    conteudo.BorderSizePixel = 0
+    conteudo.ScrollBarThickness = 4
+    conteudo.ScrollBarImageColor3 = Cores.roxo
+    conteudo.CanvasSize = UDim2.new(0, 0, 0, 0)
     conteudo.Visible = false
     conteudo.Parent = areaConteudo
     conteudosAba[nomeAba] = conteudo
@@ -309,7 +319,57 @@ end
 local botoesFlutuantes = {}
 local posicaoFlutuanteY = 100
 
-local function criarBotaoFlutuante(nomeCurto, callback)
+local function notificar(titulo, texto)
+    if not Config.notificacoes then return end
+    local notif = Instance.new("Frame")
+    notif.Size = UDim2.new(0, 260, 0, 60)
+    notif.Position = UDim2.new(1, 20, 0, 100)
+    notif.BackgroundColor3 = Cores.roxoMedio
+    notif.BorderSizePixel = 0
+    notif.Parent = gui
+
+    local canto = Instance.new("UICorner")
+    canto.CornerRadius = UDim.new(0, 8)
+    canto.Parent = notif
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Cores.roxo
+    stroke.Thickness = 2
+    stroke.Parent = notif
+
+    local lblTitulo = Instance.new("TextLabel")
+    lblTitulo.Size = UDim2.new(1, -20, 0, 22)
+    lblTitulo.Position = UDim2.new(0, 10, 0, 6)
+    lblTitulo.BackgroundTransparency = 1
+    lblTitulo.Text = titulo
+    lblTitulo.TextColor3 = Cores.roxoClaro
+    lblTitulo.TextSize = 14
+    lblTitulo.Font = Enum.Font.GothamBold
+    lblTitulo.TextXAlignment = Enum.TextXAlignment.Left
+    lblTitulo.Parent = notif
+
+    local lblTexto = Instance.new("TextLabel")
+    lblTexto.Size = UDim2.new(1, -20, 0, 28)
+    lblTexto.Position = UDim2.new(0, 10, 0, 28)
+    lblTexto.BackgroundTransparency = 1
+    lblTexto.Text = texto
+    lblTexto.TextColor3 = Cores.texto
+    lblTexto.TextSize = 12
+    lblTexto.Font = Enum.Font.Gotham
+    lblTexto.TextXAlignment = Enum.TextXAlignment.Left
+    lblTexto.TextWrapped = true
+    lblTexto.Parent = notif
+
+    TweenService:Create(notif, TweenInfo.new(0.3), {Position = UDim2.new(1, -280, 0, 100)}):Play()
+
+    task.delay(3, function()
+        TweenService:Create(notif, TweenInfo.new(0.3), {Position = UDim2.new(1, 20, 0, 100)}):Play()
+        task.wait(0.35)
+        notif:Destroy()
+    end)
+end
+
+local function criarBotaoFlutuante(nomeCurto, nomeCompleto, callback)
     if botoesFlutuantes[nomeCurto] then
         botoesFlutuantes[nomeCurto]:Destroy()
         botoesFlutuantes[nomeCurto] = nil
@@ -318,7 +378,7 @@ local function criarBotaoFlutuante(nomeCurto, callback)
 
     local botao = Instance.new("TextButton")
     botao.Name = "Float_" .. nomeCurto
-    botao.Size = UDim2.new(0, 55, 0, 55)
+    botao.Size = UDim2.new(0, 60, 0, 60)
     botao.Position = UDim2.new(0, 20, 0, posicaoFlutuanteY)
     botao.BackgroundColor3 = Cores.roxo
     botao.BackgroundTransparency = 0.2
@@ -331,7 +391,7 @@ local function criarBotaoFlutuante(nomeCurto, callback)
     botao.Draggable = true
     botao.Parent = gui
 
-    posicaoFlutuanteY = posicaoFlutuanteY + 65
+    posicaoFlutuanteY = posicaoFlutuanteY + 70
 
     local canto = Instance.new("UICorner")
     canto.CornerRadius = UDim.new(1, 0)
@@ -348,8 +408,10 @@ local function criarBotaoFlutuante(nomeCurto, callback)
         marcado = not marcado
         if marcado then
             botao.BackgroundColor3 = Cores.verde
+            notificar("Ativado", nomeCompleto)
         else
             botao.BackgroundColor3 = Cores.roxo
+            notificar("Desativado", nomeCompleto)
         end
         if callback then callback(marcado) end
     end)
@@ -360,22 +422,22 @@ end
 
 local function criarCheckbox(parent, texto, posX, posY, largura, callback, botaoNome)
     local container = Instance.new("Frame")
-    container.Size = UDim2.new(largura or 0.5, -10, 0, 28)
+    container.Size = UDim2.new(largura or 0.5, -10, 0, 30)
     container.Position = UDim2.new(posX or 0, 10, 0, posY)
     container.BackgroundTransparency = 1
     container.Parent = parent
 
     local botao = Instance.new("TextButton")
-    botao.Size = UDim2.new(0, 18, 0, 18)
-    botao.Position = UDim2.new(0, 0, 0.5, -9)
-    botao.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    botao.Size = UDim2.new(0, 20, 0, 20)
+    botao.Position = UDim2.new(0, 0, 0.5, -10)
+    botao.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     botao.BorderSizePixel = 0
     botao.Text = ""
     botao.AutoButtonColor = false
     botao.Parent = container
 
     local canto = Instance.new("UICorner")
-    canto.CornerRadius = UDim.new(0, 3)
+    canto.CornerRadius = UDim.new(0, 4)
     canto.Parent = botao
 
     local stroke = Instance.new("UIStroke")
@@ -383,10 +445,10 @@ local function criarCheckbox(parent, texto, posX, posY, largura, callback, botao
     stroke.Thickness = 2
     stroke.Parent = botao
 
-    local labelLargura = botaoNome and 0.7 or 1
+    local labelLargura = botaoNome and 0.72 or 1
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(labelLargura, -25, 1, 0)
-    label.Position = UDim2.new(0, 25, 0, 0)
+    label.Position = UDim2.new(0, 27, 0, 0)
     label.BackgroundTransparency = 1
     label.Text = texto
     label.TextColor3 = Cores.texto
@@ -401,38 +463,39 @@ local function criarCheckbox(parent, texto, posX, posY, largura, callback, botao
         local botaoFloat = Instance.new("TextButton")
         botaoFloat.Size = UDim2.new(0, 22, 0, 22)
         botaoFloat.Position = UDim2.new(1, -25, 0.5, -11)
-        botaoFloat.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+        botaoFloat.BackgroundColor3 = Cores.roxoMedio
         botaoFloat.BorderSizePixel = 0
         botaoFloat.Text = "+"
         botaoFloat.TextColor3 = Cores.texto
-        botaoFloat.TextSize = 14
+        botaoFloat.TextSize = 15
         botaoFloat.Font = Enum.Font.GothamBold
         botaoFloat.Parent = container
 
         local cantoBF = Instance.new("UICorner")
-        cantoBF.CornerRadius = UDim.new(0, 4)
+        cantoBF.CornerRadius = UDim.new(0, 5)
         cantoBF.Parent = botaoFloat
 
         botaoFloat.MouseButton1Click:Connect(function()
-            local float = criarBotaoFlutuante(botaoNome, function(estado)
+            local float = criarBotaoFlutuante(botaoNome, texto, function(estado)
                 marcado = estado
                 if marcado then
                     botao.BackgroundColor3 = Cores.roxo
                     botao.Text = "✓"
                     botao.TextSize = 14
                     botao.Font = Enum.Font.GothamBold
+                    botao.TextColor3 = Cores.texto
                 else
-                    botao.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                    botao.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
                     botao.Text = ""
                 end
                 if callback then callback(marcado) end
             end)
             if float then
                 botaoFloat.Text = "−"
-                botaoFloat.BackgroundColor3 = Cores.roxo
+                botaoFloat.BackgroundColor3 = Cores.verde
             else
                 botaoFloat.Text = "+"
-                botaoFloat.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+                botaoFloat.BackgroundColor3 = Cores.roxoMedio
             end
         end)
     end
@@ -445,9 +508,11 @@ local function criarCheckbox(parent, texto, posX, posY, largura, callback, botao
             botao.TextColor3 = Cores.texto
             botao.TextSize = 14
             botao.Font = Enum.Font.GothamBold
+            notificar("Ativado", texto)
         else
-            botao.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            botao.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
             botao.Text = ""
+            notificar("Desativado", texto)
         end
         if callback then callback(marcado) end
     end)
@@ -457,13 +522,13 @@ end
 
 local function criarSlider(parent, texto, posX, posY, largura, valorInicial, min, max, callback)
     local container = Instance.new("Frame")
-    container.Size = UDim2.new(largura or 1, -20, 0, 45)
+    container.Size = UDim2.new(largura or 1, -20, 0, 48)
     container.Position = UDim2.new(posX or 0, 10, 0, posY)
     container.BackgroundTransparency = 1
     container.Parent = parent
 
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, 0, 0, 16)
+    label.Size = UDim2.new(1, 0, 0, 18)
     label.BackgroundTransparency = 1
     label.Text = texto .. ": " .. valorInicial
     label.TextColor3 = Cores.texto
@@ -474,8 +539,8 @@ local function criarSlider(parent, texto, posX, posY, largura, valorInicial, min
 
     local fundoSlider = Instance.new("Frame")
     fundoSlider.Size = UDim2.new(1, 0, 0, 8)
-    fundoSlider.Position = UDim2.new(0, 0, 0, 22)
-    fundoSlider.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    fundoSlider.Position = UDim2.new(0, 0, 0, 24)
+    fundoSlider.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     fundoSlider.BorderSizePixel = 0
     fundoSlider.Parent = container
 
@@ -549,7 +614,7 @@ end
 
 local function criarDropdown(parent, texto, posX, posY, largura, opcoes, callback)
     local container = Instance.new("Frame")
-    container.Size = UDim2.new(largura or 1, -20, 0, 50)
+    container.Size = UDim2.new(largura or 1, -20, 0, 52)
     container.Position = UDim2.new(posX or 0, 10, 0, posY)
     container.BackgroundTransparency = 1
     container.ClipsDescendants = false
@@ -557,7 +622,7 @@ local function criarDropdown(parent, texto, posX, posY, largura, opcoes, callbac
     container.Parent = parent
 
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, 0, 0, 16)
+    label.Size = UDim2.new(1, 0, 0, 18)
     label.BackgroundTransparency = 1
     label.Text = texto
     label.TextColor3 = Cores.texto
@@ -567,9 +632,9 @@ local function criarDropdown(parent, texto, posX, posY, largura, opcoes, callbac
     label.Parent = container
 
     local botao = Instance.new("TextButton")
-    botao.Size = UDim2.new(1, 0, 0, 25)
-    botao.Position = UDim2.new(0, 0, 0, 20)
-    botao.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    botao.Size = UDim2.new(1, 0, 0, 26)
+    botao.Position = UDim2.new(0, 0, 0, 22)
+    botao.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
     botao.BorderSizePixel = 0
     botao.Text = opcoes[1] or "..."
     botao.TextColor3 = Cores.texto
@@ -579,28 +644,34 @@ local function criarDropdown(parent, texto, posX, posY, largura, opcoes, callbac
     botao.Parent = container
 
     local cantoB = Instance.new("UICorner")
-    cantoB.CornerRadius = UDim.new(0, 4)
+    cantoB.CornerRadius = UDim.new(0, 5)
     cantoB.Parent = botao
 
+    local strokeB = Instance.new("UIStroke")
+    strokeB.Color = Cores.roxo
+    strokeB.Thickness = 1
+    strokeB.Transparency = 0.5
+    strokeB.Parent = botao
+
     local lista = Instance.new("Frame")
-    lista.Size = UDim2.new(1, 0, 0, #opcoes * 25)
-    lista.Position = UDim2.new(0, 0, 1, 0)
-    lista.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    lista.Size = UDim2.new(1, 0, 0, #opcoes * 26)
+    lista.Position = UDim2.new(0, 0, 1, 2)
+    lista.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
     lista.BorderSizePixel = 0
     lista.Visible = false
     lista.ZIndex = 12
     lista.Parent = container
 
     local cantoL = Instance.new("UICorner")
-    cantoL.CornerRadius = UDim.new(0, 4)
+    cantoL.CornerRadius = UDim.new(0, 5)
     cantoL.Parent = lista
 
     local aberto = false
 
     for i, opcao in ipairs(opcoes) do
         local item = Instance.new("TextButton")
-        item.Size = UDim2.new(1, 0, 0, 25)
-        item.Position = UDim2.new(0, 0, 0, (i - 1) * 25)
+        item.Size = UDim2.new(1, 0, 0, 26)
+        item.Position = UDim2.new(0, 0, 0, (i - 1) * 26)
         item.BackgroundTransparency = 1
         item.Text = opcao
         item.TextColor3 = Cores.texto
@@ -639,15 +710,18 @@ local abaAIM = conteudosAba["AIM"]
 criarCheckbox(abaAIM, T("ativarAimbot"), 0, 10, 0.5, function(m) Config.aimbotAtivo = m end, "AIM")
 criarCheckbox(abaAIM, T("silentAim"), 0.5, 10, 0.5, function(m) Config.silentAimAtivo = m end, "SILENT")
 criarCheckbox(abaAIM, T("aimVisible"), 0, 45, 0.5, function(m) Config.aimVisible = m end, "VISIVEL")
-criarCheckbox(abaAIM, T("aimTiro"), 0.5, 45, 0.5, function(m) Config.aimTiro = m end, "TIRO")
-criarCheckbox(abaAIM, T("aimMira"), 0, 80, 0.5, function(m) Config.aimMira = m end, "MIRA")
-criarCheckbox(abaAIM, T("mostrarFov"), 0.5, 80, 0.5, function(m) Config.mostrarFov = m end, "FOV")
-criarCheckbox(abaAIM, T("autoShoot"), 0, 115, 1, function(m) Config.autoShoot = m end, "SHOOT")
+criarCheckbox(abaAIM, T("aimPrediction"), 0.5, 45, 0.5, function(m) Config.aimPrediction = m end, "PREDICT")
+criarCheckbox(abaAIM, T("triggerBot"), 0, 80, 0.5, function(m) Config.triggerBot = m end, "TRIGGER")
+criarCheckbox(abaAIM, T("noRecoil"), 0.5, 80, 0.5, function(m) Config.noRecoil = m end, "NORECOIL")
+criarCheckbox(abaAIM, T("teamCheck"), 0, 115, 0.5, function(m) Config.teamCheck = m end, "TEAM")
+criarCheckbox(abaAIM, T("mostrarFov"), 0.5, 115, 0.5, function(m) Config.mostrarFov = m end, "FOV")
+criarCheckbox(abaAIM, T("autoShoot"), 0, 150, 1, function(m) Config.autoShoot = m end, "SHOOT")
 
-criarSlider(abaAIM, "FOV", 0, 150, 1, 90, 0, 180, function(v) Config.aimFov = v end)
+criarSlider(abaAIM, "FOV", 0, 185, 1, 90, 0, 180, function(v) Config.aimFov = v end)
+criarSlider(abaAIM, "Aim Smooth", 0, 240, 1, 15, 1, 100, function(v) Config.aimSmooth = v / 100 end)
 
-criarDropdown(abaAIM, T("parteAimbot"), 0, 205, 0.5, {"Head", "Torso", "Random"}, function(v) Config.parteAimbot = v end)
-criarDropdown(abaAIM, T("parteSilent"), 0.5, 205, 0.5, {"Head", "Torso", "Random"}, function(v) Config.parteSilent = v end)
+criarDropdown(abaAIM, T("parteAimbot"), 0, 295, 0.5, {"Head", "Torso", "Random"}, function(v) Config.parteAimbot = v end)
+criarDropdown(abaAIM, T("parteSilent"), 0.5, 295, 0.5, {"Head", "Torso", "Random"}, function(v) Config.parteSilent = v end)
 
 local abaESP = conteudosAba["ESP"]
 
@@ -658,14 +732,17 @@ criarCheckbox(abaESP, T("espCaixa"), 0.5, 45, 0.5, function(m) Config.espCaixa =
 criarCheckbox(abaESP, T("espNome"), 0, 80, 0.5, function(m) Config.espNome = m end, "NOME")
 criarCheckbox(abaESP, T("espDistancia"), 0.5, 80, 0.5, function(m) Config.espDistancia = m end, "DIST")
 criarCheckbox(abaESP, T("espRainbow"), 0, 115, 0.5, function(m) Config.espRainbow = m end, "RBE")
+criarCheckbox(abaESP, T("espTracer"), 0.5, 115, 0.5, function(m) Config.espTracer = m end, "TRACER")
+criarCheckbox(abaESP, T("espHealthBar"), 0, 150, 0.5, function(m) Config.espHealthBar = m end, "HBAR")
+criarCheckbox(abaESP, T("teamCheck"), 0.5, 150, 0.5, function(m) Config.teamCheck = m end, "TEAM")
 
-criarDropdown(abaESP, T("posicaoLinha"), 0.5, 115, 0.5, {T("topoTela"), T("meioTela"), T("baixoTela")}, function(v)
+criarDropdown(abaESP, T("posicaoLinha"), 0, 185, 0.5, {T("topoTela"), T("meioTela"), T("baixoTela")}, function(v)
     if v == T("topoTela") then Config.posicaoLinha = "Topo"
     elseif v == T("baixoTela") then Config.posicaoLinha = "Baixo"
     else Config.posicaoLinha = "Meio" end
 end)
 
-criarDropdown(abaESP, T("corEsp"), 0, 160, 0.5, {"Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Rosa", "Branco"}, function(v)
+criarDropdown(abaESP, T("corEsp"), 0.5, 185, 0.5, {"Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Rosa", "Branco"}, function(v)
     if v == "Vermelho" then Config.corEsp = Color3.fromRGB(255, 0, 0)
     elseif v == "Verde" then Config.corEsp = Color3.fromRGB(0, 255, 0)
     elseif v == "Azul" then Config.corEsp = Color3.fromRGB(0, 150, 255)
@@ -675,19 +752,32 @@ criarDropdown(abaESP, T("corEsp"), 0, 160, 0.5, {"Vermelho", "Verde", "Azul", "A
     elseif v == "Branco" then Config.corEsp = Color3.fromRGB(255, 255, 255) end
 end)
 
-local abaHACKS = conteudosAba["HACKS"]
+criarSlider(abaESP, "Distância Máxima", 0, 240, 1, 500, 50, 2000, function(v) Config.espDistanciaMax = v end)
 
-criarCheckbox(abaHACKS, T("spinbot"), 0, 10, 0.5, function(m) Config.spinbot = m end, "SPIN")
-criarCheckbox(abaHACKS, T("speed"), 0.5, 10, 0.5, function(m) 
+local abaMOVE = conteudosAba["MOVE"]
+
+criarCheckbox(abaMOVE, T("speed"), 0, 10, 0.5, function(m) 
     Config.speed = m
     local char = LocalPlayer.Character
     if char and char:FindFirstChild("Humanoid") then
         char.Humanoid.WalkSpeed = m and 100 or 16
     end
 end, "SPEED")
-criarCheckbox(abaHACKS, T("fly"), 0, 45, 0.5, function(m) Config.fly = m end, "FLY")
-criarCheckbox(abaHACKS, T("ghost"), 0.5, 45, 0.5, function(m) Config.ghost = m end, "GHOST")
-criarCheckbox(abaHACKS, T("teleport"), 0, 80, 0.5, function(m) 
+criarCheckbox(abaMOVE, T("fly"), 0.5, 10, 0.5, function(m) Config.fly = m end, "FLY")
+criarCheckbox(abaMOVE, T("noclip"), 0, 45, 0.5, function(m) Config.noclip = m end, "NOCLIP")
+criarCheckbox(abaMOVE, T("superjump"), 0.5, 45, 0.5, function(m) 
+    Config.superjump = m
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        char.Humanoid.JumpPower = m and 250 or 50
+    end
+end, "SJUMP")
+criarCheckbox(abaMOVE, T("longjump"), 0, 80, 0.5, function(m) Config.longjump = m end, "LJUMP")
+criarCheckbox(abaMOVE, T("bunnyhop"), 0.5, 80, 0.5, function(m) Config.bunnyhop = m end, "BHOP")
+criarCheckbox(abaMOVE, T("infinitejump"), 0, 115, 0.5, function(m) Config.infinitejump = m end, "INFJ")
+criarCheckbox(abaMOVE, T("waterwalk"), 0.5, 115, 0.5, function(m) Config.waterwalk = m end, "AGUA")
+criarCheckbox(abaMOVE, T("gravity"), 0, 150, 0.5, function(m) Config.gravityAtivo = m end, "GRAV")
+criarCheckbox(abaMOVE, T("teleport"), 0.5, 150, 0.5, function(m) 
     if m then
         local char = LocalPlayer.Character
         if char and char:FindFirstChild("HumanoidRootPart") then
@@ -695,27 +785,90 @@ criarCheckbox(abaHACKS, T("teleport"), 0, 80, 0.5, function(m)
         end
     end
 end, "TP")
-criarCheckbox(abaHACKS, T("fullbright"), 0.5, 80, 0.5, function(m) 
+criarCheckbox(abaMOVE, T("teleportplayer"), 0, 185, 0.5, function(m) Config.teleportPlayerAtivo = m end, "TPPLAYER")
+criarCheckbox(abaMOVE, T("autorespawn"), 0.5, 185, 0.5, function(m) Config.autorespawn = m end, "RESPAWN")
+
+criarSlider(abaMOVE, "Gravity", 0, 220, 1, 196, 0, 500, function(v) Config.gravityValor = v end)
+
+local abaCHAR = conteudosAba["CHAR"]
+
+criarCheckbox(abaCHAR, T("spinbot"), 0, 10, 0.5, function(m) Config.spinbot = m end, "SPIN")
+criarCheckbox(abaCHAR, T("ghost"), 0.5, 10, 0.5, function(m) Config.ghost = m end, "GHOST")
+criarCheckbox(abaCHAR, T("antiafk"), 0, 45, 0.5, function(m) Config.antiafk = m end, "AFK")
+criarCheckbox(abaCHAR, T("hitbox"), 0.5, 45, 0.5, function(m) Config.hitbox = m end, "HITBOX")
+criarCheckbox(abaCHAR, T("headless"), 0, 80, 0.5, function(m) 
+    Config.headless = m
+    local char = LocalPlayer.Character
+    if char then
+        local head = char:FindFirstChild("Head")
+        if head then
+            head.Transparency = m and 1 or 0
+        end
+    end
+end, "HEADLESS")
+
+criarSlider(abaCHAR, "Hitbox Size", 0, 115, 1, 5, 1, 20, function(v) Config.hitboxSize = v end)
+criarSlider(abaCHAR, T("charsise"), 0, 170, 1, 1, 1, 5, function(v) 
+    Config.charSize = v
+    local char = LocalPlayer.Character
+    if char then
+        local hum = char:FindFirstChild("Humanoid")
+        if hum then
+            local scale = hum:FindFirstChild("BodyHeightScale")
+            if scale then scale.Value = v end
+        end
+    end
+end)
+
+local abaVISUAL = conteudosAba["VISUAL"]
+
+criarCheckbox(abaVISUAL, T("fullbright"), 0, 10, 0.5, function(m) 
     Config.fullbright = m
     if m then
         Lighting.Ambient = Color3.fromRGB(255, 255, 255)
         Lighting.Brightness = 2
+        Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
     else
         Lighting.Ambient = Color3.fromRGB(70, 70, 70)
         Lighting.Brightness = 1
     end
 end, "FULL")
-criarCheckbox(abaHACKS, T("nofog"), 0, 115, 0.5, function(m) 
+criarCheckbox(abaVISUAL, T("nofog"), 0.5, 10, 0.5, function(m) 
     Config.nofog = m
-    if m then
-        Lighting.FogEnd = 100000
-    else
-        Lighting.FogEnd = 1000
-    end
+    Lighting.FogEnd = m and 100000 or 1000
 end, "NOFOG")
-criarCheckbox(abaHACKS, T("infinitejump"), 0.5, 115, 0.5, function(m) Config.infinitejump = m end, "INFJ")
-criarCheckbox(abaHACKS, T("antiafk"), 0, 150, 0.5, function(m) Config.antiafk = m end, "AFK")
-criarCheckbox(abaHACKS, T("waterwalk"), 0.5, 150, 0.5, function(m) Config.waterwalk = m end, "AGUA")
+criarCheckbox(abaVISUAL, T("fpsboost"), 0, 45, 0.5, function(m) 
+    Config.fpsboost = m
+    if m then
+        Lighting.GlobalShadows = false
+        Lighting.ShadowSoftness = 0
+    else
+        Lighting.GlobalShadows = true
+        Lighting.ShadowSoftness = 0.2
+    end
+end, "FPS")
+criarCheckbox(abaVISUAL, T("noparticles"), 0.5, 45, 0.5, function(m) 
+    Config.noparticles = m
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Smoke") or obj:IsA("Fire") then
+            obj.Enabled = not m
+        end
+    end
+end, "NOPART")
+
+criarSlider(abaVISUAL, T("timeofday"), 0, 80, 1, 12, 0, 24, function(v) 
+    Config.timeofdayValor = v
+    if Config.timeofday then
+        Lighting.ClockTime = v
+    end
+end)
+
+criarCheckbox(abaVISUAL, T("timeofday"), 0, 135, 1, function(m) 
+    Config.timeofday = m
+    if m then
+        Lighting.ClockTime = Config.timeofdayValor
+    end
+end, "TIME")
 
 local abaCFG = conteudosAba["CFG"]
 
@@ -723,6 +876,7 @@ criarDropdown(abaCFG, T("lingua"), 0, 10, 1, {"PT", "EN", "ES"}, function(v)
     if v == "PT" then idiomaAtual = "pt"
     elseif v == "EN" then idiomaAtual = "en"
     else idiomaAtual = "es" end
+    notificar("Língua", "Alterada para " .. v)
 end)
 
 criarDropdown(abaCFG, T("corPainel"), 0, 75, 1, {"Roxo", "Verde", "Azul", "Vermelho", "Laranja", "Rosa", "Ciano"}, function(v)
@@ -737,12 +891,17 @@ criarDropdown(abaCFG, T("corPainel"), 0, 75, 1, {"Roxo", "Verde", "Azul", "Verme
     bordaPainel.Color = Config.corPainel
 end)
 
-criarCheckbox(abaCFG, T("rainbow"), 0, 140, 1, function(m) Config.rainbow = m end)
+criarCheckbox(abaCFG, T("rainbow"), 0, 140, 1, function(m) Config.rainbow = m end, "RAINBOW")
+criarCheckbox(abaCFG, T("notifications"), 0, 175, 0.5, function(m) Config.notificacoes = m end)
+criarCheckbox(abaCFG, T("watermark"), 0.5, 175, 0.5, function(m) 
+    Config.watermark = m
+    if watermark then watermark.Visible = m end
+end)
 
 local abaINFO = conteudosAba["INFO"]
 
 local infoLabel = Instance.new("TextLabel")
-infoLabel.Size = UDim2.new(1, -20, 1, -20)
+infoLabel.Size = UDim2.new(1, -20, 0, 200)
 infoLabel.Position = UDim2.new(0, 10, 0, 10)
 infoLabel.BackgroundTransparency = 1
 infoLabel.Text = T("infoTexto")
@@ -753,6 +912,25 @@ infoLabel.TextXAlignment = Enum.TextXAlignment.Left
 infoLabel.TextYAlignment = Enum.TextYAlignment.Top
 infoLabel.Parent = abaINFO
 
+local btnFecharPainel = Instance.new("TextButton")
+btnFecharPainel.Size = UDim2.new(1, -20, 0, 40)
+btnFecharPainel.Position = UDim2.new(0, 10, 0, 220)
+btnFecharPainel.BackgroundColor3 = Cores.vermelho
+btnFecharPainel.BorderSizePixel = 0
+btnFecharPainel.Text = "SAIR"
+btnFecharPainel.TextColor3 = Cores.texto
+btnFecharPainel.TextSize = 14
+btnFecharPainel.Font = Enum.Font.GothamBold
+btnFecharPainel.Parent = abaINFO
+
+local cantoSair = Instance.new("UICorner")
+cantoSair.CornerRadius = UDim.new(0, 6)
+cantoSair.Parent = btnFecharPainel
+
+btnFecharPainel.MouseButton1Click:Connect(function()
+    gui:Destroy()
+end)
+
 local function trocarAba(nomeAba)
     for nome, conteudo in pairs(conteudosAba) do
         conteudo.Visible = (nome == nomeAba)
@@ -762,7 +940,7 @@ local function trocarAba(nomeAba)
             botao.BackgroundTransparency = 0.1
             botao.TextColor3 = Cores.roxoClaro
         else
-            botao.BackgroundTransparency = 0.3
+            botao.BackgroundTransparency = 0.4
             botao.TextColor3 = Cores.texto
         end
     end
@@ -778,13 +956,13 @@ botaoMinimizar.MouseButton1Click:Connect(function()
     if menuLateral.Visible then
         menuLateral.Visible = false
         areaConteudo.Visible = false
-        painel.Size = UDim2.new(0, 520, 0, 30)
-        botaoMinimizar.Text = "▲"
+        painel.Size = UDim2.new(0, 560, 0, 34)
+        botaoMinimizar.Text = "+"
     else
         menuLateral.Visible = true
         areaConteudo.Visible = true
-        painel.Size = UDim2.new(0, 520, 0, 380)
-        botaoMinimizar.Text = "▼"
+        painel.Size = UDim2.new(0, 560, 0, 400)
+        botaoMinimizar.Text = "−"
     end
 end)
 
@@ -804,6 +982,28 @@ RunService.Heartbeat:Connect(function(dt)
         bordaPainel.Color = Config.corPainel
     end
 end)
+
+local watermark = Instance.new("TextLabel")
+watermark.Name = "Watermark"
+watermark.Size = UDim2.new(0, 180, 0, 30)
+watermark.Position = UDim2.new(0, 20, 0, 20)
+watermark.BackgroundColor3 = Cores.roxoMedio
+watermark.BackgroundTransparency = 0.3
+watermark.BorderSizePixel = 0
+watermark.Text = "FFH4X | Ewerton"
+watermark.TextColor3 = Cores.roxoClaro
+watermark.TextSize = 14
+watermark.Font = Enum.Font.GothamBold
+watermark.Parent = gui
+
+local cantoWM = Instance.new("UICorner")
+cantoWM.CornerRadius = UDim.new(0, 6)
+cantoWM.Parent = watermark
+
+local strokeWM = Instance.new("UIStroke")
+strokeWM.Color = Cores.roxo
+strokeWM.Thickness = 1
+strokeWM.Parent = watermark
 
 local fovCircle = Instance.new("Frame")
 fovCircle.Name = "FOVCircle"
@@ -840,13 +1040,13 @@ local function criarESP(jogador)
     highlight.Parent = gui
 
     local billboard = Instance.new("BillboardGui")
-    billboard.Size = UDim2.new(0, 200, 0, 60)
-    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.Size = UDim2.new(0, 200, 0, 70)
+    billboard.StudsOffset = Vector3.new(0, 3.5, 0)
     billboard.AlwaysOnTop = true
     billboard.Adornee = jogador.Character and jogador.Character:FindFirstChild("Head")
 
     local nomeLabel = Instance.new("TextLabel")
-    nomeLabel.Size = UDim2.new(1, 0, 0.33, 0)
+    nomeLabel.Size = UDim2.new(1, 0, 0.25, 0)
     nomeLabel.BackgroundTransparency = 1
     nomeLabel.Text = jogador.Name
     nomeLabel.TextColor3 = Config.corEsp
@@ -856,8 +1056,8 @@ local function criarESP(jogador)
     nomeLabel.Parent = billboard
 
     local distLabel = Instance.new("TextLabel")
-    distLabel.Size = UDim2.new(1, 0, 0.33, 0)
-    distLabel.Position = UDim2.new(0, 0, 0.33, 0)
+    distLabel.Size = UDim2.new(1, 0, 0.25, 0)
+    distLabel.Position = UDim2.new(0, 0, 0.25, 0)
     distLabel.BackgroundTransparency = 1
     distLabel.Text = "0"
     distLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -867,8 +1067,8 @@ local function criarESP(jogador)
     distLabel.Parent = billboard
 
     local vidaLabel = Instance.new("TextLabel")
-    vidaLabel.Size = UDim2.new(1, 0, 0.33, 0)
-    vidaLabel.Position = UDim2.new(0, 0, 0.66, 0)
+    vidaLabel.Size = UDim2.new(1, 0, 0.25, 0)
+    vidaLabel.Position = UDim2.new(0, 0, 0.5, 0)
     vidaLabel.BackgroundTransparency = 1
     vidaLabel.Text = "100 HP"
     vidaLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
@@ -877,6 +1077,19 @@ local function criarESP(jogador)
     vidaLabel.Font = Enum.Font.Gotham
     vidaLabel.Parent = billboard
 
+    local healthBarBG = Instance.new("Frame")
+    healthBarBG.Size = UDim2.new(0.8, 0, 0, 6)
+    healthBarBG.Position = UDim2.new(0.1, 0, 0.75, 0)
+    healthBarBG.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    healthBarBG.BorderSizePixel = 0
+    healthBarBG.Parent = billboard
+
+    local healthBarFill = Instance.new("Frame")
+    healthBarFill.Size = UDim2.new(1, 0, 1, 0)
+    healthBarFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    healthBarFill.BorderSizePixel = 0
+    healthBarFill.Parent = healthBarBG
+
     billboard.Parent = gui
 
     espCache[jogador] = {
@@ -884,7 +1097,8 @@ local function criarESP(jogador)
         billboard = billboard,
         nome = nomeLabel,
         distancia = distLabel,
-        vida = vidaLabel
+        vida = vidaLabel,
+        healthBar = healthBarFill
     }
 end
 
@@ -897,14 +1111,19 @@ local function removerESP(jogador)
 end
 
 local linhasCache = {}
+local tracerCache = {}
 
 local function atualizarLinhas()
     for jogador, linha in pairs(linhasCache) do
         if linha then linha:Destroy() end
         linhasCache[jogador] = nil
     end
+    for jogador, tracer in pairs(tracerCache) do
+        if tracer then tracer:Destroy() end
+        tracerCache[jogador] = nil
+    end
 
-    if not Config.espLinha then return end
+    if not (Config.espLinha or Config.espTracer) then return end
 
     local camera = workspace.CurrentCamera
     local viewport = camera.ViewportSize
@@ -918,14 +1137,27 @@ local function atualizarLinhas()
             if head then
                 local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
                 if onScreen then
-                    local linha = Instance.new("Frame")
-                    linha.Size = UDim2.new(0, 1, 0, math.abs(yPos - screenPos.Y))
-                    linha.Position = UDim2.new(0, screenPos.X, 0, math.min(yPos, screenPos.Y))
-                    linha.BackgroundColor3 = Config.corEsp
-                    linha.BorderSizePixel = 0
-                    linha.ZIndex = 5
-                    linha.Parent = gui
-                    linhasCache[jogador] = linha
+                    if Config.espLinha then
+                        local linha = Instance.new("Frame")
+                        linha.Size = UDim2.new(0, 1, 0, math.abs(yPos - screenPos.Y))
+                        linha.Position = UDim2.new(0, screenPos.X, 0, math.min(yPos, screenPos.Y))
+                        linha.BackgroundColor3 = Config.corEsp
+                        linha.BorderSizePixel = 0
+                        linha.ZIndex = 5
+                        linha.Parent = gui
+                        linhasCache[jogador] = linha
+                    end
+                    if Config.espTracer then
+                        local tracer = Instance.new("Frame")
+                        tracer.AnchorPoint = Vector2.new(0.5, 0)
+                        tracer.Size = UDim2.new(0, 1, 0, math.abs(viewport.Y - screenPos.Y))
+                        tracer.Position = UDim2.new(0, screenPos.X, 0.5, 0)
+                        tracer.BackgroundColor3 = Config.corEsp
+                        tracer.BorderSizePixel = 0
+                        tracer.ZIndex = 5
+                        tracer.Parent = gui
+                        tracerCache[jogador] = tracer
+                    end
                 end
             end
         end
@@ -942,8 +1174,13 @@ local function temParede(posOrigem, posAlvo, personagemAlvo)
     params.FilterType = Enum.RaycastFilterType.Exclude
     local direcao = posAlvo - posOrigem
     local resultado = workspace:Raycast(posOrigem, direcao, params)
-    if resultado then
-        return true
+    return resultado ~= nil
+end
+
+local function mesmoTime(jogador)
+    if not Config.teamCheck then return false end
+    if jogador.Team and LocalPlayer.Team then
+        return jogador.Team == LocalPlayer.Team
     end
     return false
 end
@@ -959,7 +1196,7 @@ local function pegarAlvo(parte)
     local menorDist = math.huge
 
     for _, jogador in ipairs(Players:GetPlayers()) do
-        if jogador ~= LocalPlayer and jogador.Character then
+        if jogador ~= LocalPlayer and jogador.Character and not mesmoTime(jogador) then
             local humanoid = jogador.Character:FindFirstChild("Humanoid")
             local hrp = jogador.Character:FindFirstChild("HumanoidRootPart")
             local head = jogador.Character:FindFirstChild("Head")
@@ -1058,6 +1295,7 @@ RunService.RenderStepped:Connect(function()
     if Config.mostrarFov then
         fovCircle.Visible = true
         fovCircle.Size = UDim2.new(0, Config.aimFov * 10, 0, Config.aimFov * 10)
+        fovStroke.Color = Config.corEsp
     else
         fovCircle.Visible = false
     end
@@ -1065,7 +1303,7 @@ RunService.RenderStepped:Connect(function()
         local alvo = pegarAlvo(Config.parteAimbot)
         if alvo then
             local targetCF = CFrame.new(Camera.CFrame.Position, alvo.Position)
-            Camera.CFrame = Camera.CFrame:Lerp(targetCF, 0.2)
+            Camera.CFrame = Camera.CFrame:Lerp(targetCF, Config.aimSmooth)
         end
     end
 end)
@@ -1109,6 +1347,14 @@ RunService.RenderStepped:Connect(function()
                     local hum = jogador.Character:FindFirstChild("Humanoid")
                     if hum then
                         cache.vida.Text = math.floor(hum.Health) .. " HP"
+                        cache.healthBar.Size = UDim2.new(hum.Health / hum.MaxHealth, 0, 1, 0)
+                        if hum.Health / hum.MaxHealth > 0.5 then
+                            cache.healthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+                        elseif hum.Health / hum.MaxHealth > 0.25 then
+                            cache.healthBar.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
+                        else
+                            cache.healthBar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+                        end
                     end
                 end
             end
@@ -1121,6 +1367,10 @@ RunService.RenderStepped:Connect(function()
         for jogador, linha in pairs(linhasCache) do
             if linha then linha:Destroy() end
             linhasCache[jogador] = nil
+        end
+        for jogador, tracer in pairs(tracerCache) do
+            if tracer then tracer:Destroy() end
+            tracerCache[jogador] = nil
         end
     end
 end)
@@ -1148,15 +1398,28 @@ RunService.RenderStepped:Connect(function()
             if UserInputService:IsKeyDown(Enum.KeyCode.Space) then direcao = direcao + Vector3.new(0, 1, 0) end
             if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then direcao = direcao - Vector3.new(0, 1, 0) end
             if direcao.Magnitude > 0 then
-                direcao = direcao.Unit * 50
+                direcao = direcao.Unit * 60
             end
             hrp.Velocity = direcao
         end
     end
 end)
 
+RunService.Stepped:Connect(function()
+    if Config.noclip then
+        local char = LocalPlayer.Character
+        if char then
+            for _, parte in ipairs(char:GetDescendants()) do
+                if parte:IsA("BasePart") and parte.CanCollide then
+                    parte.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
 UserInputService.JumpRequest:Connect(function()
-    if Config.infinitejump then
+    if Config.infinitejump or Config.bunnyhop then
         local char = LocalPlayer.Character
         if char and char:FindFirstChild("Humanoid") then
             char.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
@@ -1186,8 +1449,54 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
+RunService.Heartbeat:Connect(function()
+    if Config.gravityAtivo then
+        workspace.Gravity = Config.gravityValor
+    end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if Config.hitbox then
+        for _, jogador in ipairs(Players:GetPlayers()) do
+            if jogador ~= LocalPlayer and jogador.Character then
+                local hrp = jogador.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    hrp.Size = Vector3.new(Config.hitboxSize, Config.hitboxSize, Config.hitboxSize)
+                    hrp.Transparency = 0.7
+                    hrp.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
+RunService.Heartbeat:Connect(function()
+    if Config.teleportPlayerAtivo then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            for _, jogador in ipairs(Players:GetPlayers()) do
+                if jogador ~= LocalPlayer and jogador.Character and jogador.Character:FindFirstChild("HumanoidRootPart") then
+                    char.HumanoidRootPart.CFrame = jogador.Character.HumanoidRootPart.CFrame + Vector3.new(0, 3, 0)
+                    break
+                end
+            end
+        end
+    end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function(char)
+    if Config.autorespawn then
+        task.wait(1)
+        local hum = char:FindFirstChild("Humanoid")
+        if hum then
+            hum.Health = hum.MaxHealth
+        end
+    end
+end)
+
 Players.PlayerRemoving:Connect(function(jogador)
     removerESP(jogador)
 end)
 
-print("[FFH4X] v6.0 carregado! Feito por Ewerton")
+notificar("FFH4X", "v7.0 carregado! Feito por Ewerton")
+print("[FFH4X] v7.0 carregado! Feito por Ewerton")
