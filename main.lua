@@ -1,441 +1,867 @@
 --[[
-    Best Script GUI v1.2
+    FFH4X - Painel Roblox v2.0
     Feito por Ewerton
 ]]
 
 local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
+local Camera = workspace.CurrentCamera
 
 local LocalPlayer = Players.LocalPlayer
 
--- ============ JOGOS SUPORTADOS ============
-local JogosSuportados = {
-    [2753915549] = {
-        nome = "Blox Fruits",
-        funcoes = {
-            {nome = "Auto Farm", acao = function() print("[Best Script] Auto Farm") end},
-            {nome = "Infinite Money", acao = function() print("[Best Script] Money infinito") end},
-            {nome = "Teleport Ilha 1", acao = function() print("[Best Script] TP Ilha 1") end}
-        }
+-- ============ LIMPAR GUI ANTIGA ============
+if CoreGui:FindFirstChild("FFH4X") then
+    CoreGui.FFH4X:Destroy()
+end
+
+-- ============ TEXTOS POR IDIOMA ============
+local Textos = {
+    pt = {
+        aim = "AIM", esp = "ESP", cfg = "CFG", info = "INFO",
+        ativarAimbot = "Ativar Aimbot",
+        silentAim = "Silent Aim",
+        aimVisible = "Aim Visible",
+        aimTiro = "Aim Tiro",
+        aimMira = "Aim Mira",
+        regularFov = "Regular FOV",
+        parteAimbot = "Parte do Aimbot",
+        parteSilent = "Parte do Silent Aim",
+        espVida = "ESP Vida",
+        espLinha = "ESP Linha",
+        espCaixa = "ESP Caixa",
+        espNome = "ESP Nome",
+        espDistancia = "ESP Distância",
+        corEsp = "Cor do ESP",
+        posicaoLinha = "Posição da Linha",
+        topoTela = "Topo da Tela",
+        meioTela = "Meio da Tela",
+        baixoTela = "Baixo da Tela",
+        corPainel = "Cor do Painel",
+        rainbow = "Modo Rainbow",
+        rainbowOn = "ATIVADO",
+        rainbowOff = "DESATIVADO",
+        lingua = "Língua",
+        info = "INFO",
+        infoTexto = "FFH4X\nVersão: 2.0\nFeito por: Ewerton\n\nUse com responsabilidade."
     },
-    [2788229376] = {
-        nome = "Da Hood",
-        funcoes = {
-            {nome = "Aimbot", acao = function() print("[Best Script] Aimbot") end},
-            {nome = "Auto Rob", acao = function() print("[Best Script] Auto Rob") end},
-            {nome = "God Mode", acao = function() print("[Best Script] God") end}
-        }
+    en = {
+        aim = "AIM", esp = "ESP", cfg = "CFG", info = "INFO",
+        ativarAimbot = "Enable Aimbot",
+        silentAim = "Silent Aim",
+        aimVisible = "Aim Visible",
+        aimTiro = "Aim Shot",
+        aimMira = "Aim Scope",
+        regularFov = "Adjust FOV",
+        parteAimbot = "Aimbot Part",
+        parteSilent = "Silent Aim Part",
+        espVida = "ESP Health",
+        espLinha = "ESP Line",
+        espCaixa = "ESP Box",
+        espNome = "ESP Name",
+        espDistancia = "ESP Distance",
+        corEsp = "ESP Color",
+        posicaoLinha = "Line Position",
+        topoTela = "Top of Screen",
+        meioTela = "Middle of Screen",
+        baixoTela = "Bottom of Screen",
+        corPainel = "Panel Color",
+        rainbow = "Rainbow Mode",
+        rainbowOn = "ENABLED",
+        rainbowOff = "DISABLED",
+        lingua = "Language",
+        info = "INFO",
+        infoTexto = "FFH4X\nVersion: 2.0\nMade by: Ewerton\n\nUse responsibly."
     },
-    [3260590327] = {
-        nome = "Arsenal",
-        funcoes = {
-            {nome = "Silent Aim", acao = function() print("[Best Script] Silent Aim") end},
-            {nome = "ESP", acao = function() print("[Best Script] ESP") end},
-            {nome = "No Recoil", acao = function() print("[Best Script] No Recoil") end}
-        }
+    es = {
+        aim = "AIM", esp = "ESP", cfg = "CFG", info = "INFO",
+        ativarAimbot = "Activar Aimbot",
+        silentAim = "Silent Aim",
+        aimVisible = "Aim Visible",
+        aimTiro = "Aim Disparo",
+        aimMira = "Aim Mira",
+        regularFov = "Ajustar FOV",
+        parteAimbot = "Parte del Aimbot",
+        parteSilent = "Parte del Silent Aim",
+        espVida = "ESP Vida",
+        espLinha = "ESP Línea",
+        espCaixa = "ESP Caja",
+        espNome = "ESP Nombre",
+        espDistancia = "ESP Distancia",
+        corEsp = "Color del ESP",
+        posicaoLinha = "Posición de Línea",
+        topoTela = "Parte Superior",
+        meioTela = "Centro de Pantalla",
+        baixoTela = "Parte Inferior",
+        corPainel = "Color del Panel",
+        rainbow = "Modo Arcoíris",
+        rainbowOn = "ACTIVADO",
+        rainbowOff = "DESACTIVADO",
+        lingua = "Idioma",
+        info = "INFO",
+        infoTexto = "FFH4X\nVersión: 2.0\nHecho por: Ewerton\n\nUsar con responsabilidad."
     }
 }
 
-local FuncoesUniversais = {
-    {nome = "Speed 100", acao = function()
-        local char = LocalPlayer.Character
-        if char and char:FindFirstChild("Humanoid") then
-            char.Humanoid.WalkSpeed = 100
-        end
-    end},
-    {nome = "Jump 200", acao = function()
-        local char = LocalPlayer.Character
-        if char and char:FindFirstChild("Humanoid") then
-            char.Humanoid.JumpPower = 200
-        end
-    end},
-    {nome = "Resetar", acao = function()
-        if LocalPlayer.Character then
-            LocalPlayer.Character:BreakJoints()
-        end
-    end}}
-}
+local idiomaAtual = "pt"
 
--- ============ LIMPAR GUI ANTIGA ============
-if CoreGui:FindFirstChild("BestScriptGui") then
-    CoreGui.BestScriptGui:Destroy()
+local function T(chave)
+    return Textos[idiomaAtual][chave] or chave
 end
 
--- ============ VARIÁVEIS DE ESTADO ============
-local arrastando = false
-local arrastandoSlider = false
-local offsetInicial = nil
-local painelAberto = false
+-- ============ CONFIGURAÇÕES ============
+local Config = {
+    -- AIM
+    aimbotAtivo = false,
+    silentAimAtivo = false,
+    aimVisible = false,
+    aimTiro = false,
+    aimMira = false,
+    aimFov = 90,
+    parteAimbot = "Head",
+    parteSilent = "Head",
+    -- ESP
+    espAtivo = false,
+    espVida = false,
+    espLinha = false,
+    espCaixa = false,
+    espNome = true,
+    espDistancia = true,
+    corEsp = Color3.fromRGB(255, 0, 0),
+    posicaoLinha = "Meio",
+    -- CFG
+    corPainel = Color3.fromRGB(120, 0, 200),
+    rainbow = false
+}
+
+-- ============ CORES ============
+local Cores = {
+    roxo = Config.corPainel,
+    roxoEscuro = Color3.fromRGB(40, 5, 70),
+    roxoClaro = Color3.fromRGB(160, 60, 220),
+    fundo = Color3.fromRGB(25, 5, 45),
+    fundoAba = Color3.fromRGB(45, 10, 75),
+    texto = Color3.fromRGB(255, 255, 255),
+    cinza = Color3.fromRGB(180, 180, 180)
+}
 
 -- ============ GUI PRINCIPAL ============
 local gui = Instance.new("ScreenGui")
-gui.Name = "BestScriptGui"
+gui.Name = "FFH4X"
 gui.ResetOnSpawn = false
 gui.IgnoreGuiInset = true
 gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = CoreGui
 
-local container = Instance.new("Frame")
-container.Name = "Container"
-container.Size = UDim2.new(0, 400, 0, 320)
-container.Position = UDim2.new(0.5, 0, 0.5, 0)
-container.AnchorPoint = Vector2.new(0.5, 0.5)
-container.BackgroundTransparency = 1
-container.Parent = gui
+local painel = Instance.new("Frame")
+painel.Name = "Painel"
+painel.Size = UDim2.new(0, 520, 0, 340)
+painel.Position = UDim2.new(0.5, -260, 0.5, -170)
+painel.BackgroundColor3 = Cores.fundo
+painel.BorderSizePixel = 0
+painel.Active = true
+painel.Draggable = true
+painel.Parent = gui
 
-local uiScale = Instance.new("UIScale")
-uiScale.Scale = 1
-uiScale.Parent = container
+local cantoPainel = Instance.new("UICorner")
+cantoPainel.CornerRadius = UDim.new(0, 8)
+cantoPainel.Parent = painel
 
-local fundo = Instance.new("Frame")
-fundo.Name = "Fundo"
-fundo.Size = UDim2.new(1, 0, 1, 0)
-fundo.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
-fundo.BackgroundTransparency = 0.05
-fundo.BorderSizePixel = 0
-fundo.Parent = container
+local bordaPainel = Instance.new("UIStroke")
+bordaPainel.Color = Cores.roxo
+bordaPainel.Thickness = 2
+bordaPainel.Parent = painel
 
-local cantoFundo = Instance.new("UICorner")
-cantoFundo.CornerRadius = UDim.new(0, 12)
-cantoFundo.Parent = fundo
+-- ============ HEADER ============
+local header = Instance.new("Frame")
+header.Name = "Header"
+header.Size = UDim2.new(1, 0, 0, 30)
+header.BackgroundColor3 = Cores.roxo
+header.BorderSizePixel = 0
+header.Parent = painel
 
-local bordaFundo = Instance.new("UIStroke")
-bordaFundo.Color = Color3.fromRGB(0, 200, 120)
-bordaFundo.Thickness = 2
-bordaFundo.Transparency = 0.3
-bordaFundo.Parent = fundo
+local cantoHeader = Instance.new("UICorner")
+cantoHeader.CornerRadius = UDim.new(0, 8)
+cantoHeader.Parent = header
 
--- ============ BARRA DE TÍTULO ============
-local barraTitulo = Instance.new("Frame")
-barraTitulo.Name = "BarraTitulo"
-barraTitulo.Size = UDim2.new(1, 0, 0, 50)
-barraTitulo.Position = UDim2.new(0, 0, 0, 0)
-barraTitulo.BackgroundColor3 = Color3.fromRGB(0, 200, 120)
-barraTitulo.BackgroundTransparency = 0.15
-barraTitulo.BorderSizePixel = 0
-barraTitulo.Parent = fundo
+local botaoMinimizar = Instance.new("TextButton")
+botaoMinimizar.Size = UDim2.new(0, 25, 0, 25)
+botaoMinimizar.Position = UDim2.new(0, 5, 0, 2)
+botaoMinimizar.BackgroundTransparency = 1
+botaoMinimizar.Text = "▼"
+botaoMinimizar.TextColor3 = Cores.texto
+botaoMinimizar.TextSize = 14
+botaoMinimizar.Font = Enum.Font.GothamBold
+botaoMinimizar.Parent = header
 
-local cantoBarra = Instance.new("UICorner")
-cantoBarra.CornerRadius = UDim.new(0, 12)
-cantoBarra.Parent = barraTitulo
+local tituloHeader = Instance.new("TextLabel")
+tituloHeader.Size = UDim2.new(0.5, 0, 1, 0)
+tituloHeader.Position = UDim2.new(0.25, 0, 0, 0)
+tituloHeader.BackgroundTransparency = 1
+tituloHeader.Text = "FFH4X"
+tituloHeader.TextColor3 = Cores.texto
+tituloHeader.TextSize = 16
+tituloHeader.Font = Enum.Font.GothamBold
+tituloHeader.Parent = header
 
-local titulo = Instance.new("TextLabel")
-titulo.Name = "Titulo"
-titulo.Size = UDim2.new(0.7, 0, 1, 0)
-titulo.Position = UDim2.new(0.05, 0, 0, 0)
-titulo.BackgroundTransparency = 1
-titulo.Text = "Best Script"
-titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
-titulo.TextSize = 22
-titulo.Font = Enum.Font.GothamBold
-titulo.TextXAlignment = Enum.TextXAlignment.Left
-titulo.Parent = barraTitulo
+local autorHeader = Instance.new("TextLabel")
+autorHeader.Size = UDim2.new(0.3, 0, 1, 0)
+autorHeader.Position = UDim2.new(0.6, 0, 0, 0)
+autorHeader.BackgroundTransparency = 1
+autorHeader.Text = "Feito por Ewerton"
+autorHeader.TextColor3 = Cores.cinza
+autorHeader.TextSize = 11
+autorHeader.Font = Enum.Font.Gotham
+autorHeader.TextXAlignment = Enum.TextXAlignment.Right
+autorHeader.Parent = header
 
 local botaoFechar = Instance.new("TextButton")
-botaoFechar.Name = "BotaoFechar"
-botaoFechar.Size = UDim2.new(0, 30, 0, 30)
-botaoFechar.Position = UDim2.new(1, -40, 0, 10)
-botaoFechar.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
-botaoFechar.BorderSizePixel = 0
+botaoFechar.Size = UDim2.new(0, 25, 0, 25)
+botaoFechar.Position = UDim2.new(1, -30, 0, 2)
+botaoFechar.BackgroundTransparency = 1
 botaoFechar.Text = "X"
-botaoFechar.TextColor3 = Color3.fromRGB(255, 255, 255)
-botaoFechar.TextSize = 16
+botaoFechar.TextColor3 = Cores.texto
+botaoFechar.TextSize = 14
 botaoFechar.Font = Enum.Font.GothamBold
-botaoFechar.Parent = barraTitulo
+botaoFechar.Parent = header
 
-local cantoFechar = Instance.new("UICorner")
-cantoFechar.CornerRadius = UDim.new(1, 0)
-cantoFechar.Parent = botaoFechar
+-- ============ MENU LATERAL ============
+local menuLateral = Instance.new("Frame")
+menuLateral.Name = "MenuLateral"
+menuLateral.Size = UDim2.new(0, 80, 1, -30)
+menuLateral.Position = UDim2.new(0, 0, 0, 30)
+menuLateral.BackgroundColor3 = Cores.roxoEscuro
+menuLateral.BorderSizePixel = 0
+menuLateral.Parent = painel
 
-local autor = Instance.new("TextLabel")
-autor.Name = "Autor"
-autor.Size = UDim2.new(1, 0, 0, 25)
-autor.Position = UDim2.new(0, 0, 0, 55)
-autor.BackgroundTransparency = 1
-autor.Text = "Feito por Ewerton"
-autor.TextColor3 = Color3.fromRGB(150, 150, 170)
-autor.TextSize = 14
-autor.Font = Enum.Font.Gotham
-autor.Parent = fundo
+local abas = {"AIM", "ESP", "CFG", "INFO"}
+local botoesAba = {}
+local conteudosAba = {}
 
--- ============ MENU PRINCIPAL ============
-local menuPrincipal = Instance.new("Frame")
-menuPrincipal.Name = "MenuPrincipal"
-menuPrincipal.Size = UDim2.new(1, -40, 1, -110)
-menuPrincipal.Position = UDim2.new(0, 20, 0, 95)
-menuPrincipal.BackgroundTransparency = 1
-menuPrincipal.Visible = true
-menuPrincipal.Parent = fundo
+local areaConteudo = Instance.new("Frame")
+areaConteudo.Size = UDim2.new(1, -80, 1, -30)
+areaConteudo.Position = UDim2.new(0, 80, 0, 30)
+areaConteudo.BackgroundTransparency = 1
+areaConteudo.Parent = painel
 
-local botoesInfo = {
-    {nome = "Jogar", cor = Color3.fromRGB(0, 200, 120)},
-    {nome = "Configurações", cor = Color3.fromRGB(0, 150, 200)},
-    {nome = "Sair", cor = Color3.fromRGB(200, 60, 60)}
-}
-
-local botoes = {}
-
-for i, info in ipairs(botoesInfo) do
+for i, nomeAba in ipairs(abas) do
     local botao = Instance.new("TextButton")
-    botao.Name = "Botao_" .. info.nome
-    botao.Size = UDim2.new(1, 0, 0, 50)
-    botao.Position = UDim2.new(0, 0, 0, (i - 1) * 60)
-    botao.BackgroundColor3 = info.cor
-    botao.BackgroundTransparency = 0.15
+    botao.Name = "Aba_" .. nomeAba
+    botao.Size = UDim2.new(1, 0, 0, 40)
+    botao.Position = UDim2.new(0, 0, 0, (i - 1) * 40)
+    botao.BackgroundColor3 = Cores.fundoAba
+    botao.BackgroundTransparency = 0.3
     botao.BorderSizePixel = 0
-    botao.Text = info.nome
-    botao.TextColor3 = Color3.fromRGB(255, 255, 255)
-    botao.TextSize = 18
+    botao.Text = nomeAba
+    botao.TextColor3 = Cores.texto
+    botao.TextSize = 13
     botao.Font = Enum.Font.GothamBold
     botao.AutoButtonColor = false
-    botao.Parent = menuPrincipal
+    botao.Parent = menuLateral
+    botoesAba[nomeAba] = botao
 
-    local canto = Instance.new("UICorner")
-    canto.CornerRadius = UDim.new(0, 8)
-    canto.Parent = botao
-
-    local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(255, 255, 255)
-    stroke.Thickness = 1
-    stroke.Transparency = 0.7
-    stroke.Parent = botao
-
-    botao.MouseEnter:Connect(function()
-        TweenService:Create(botao, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
-    end)
-
-    botao.MouseLeave:Connect(function()
-        TweenService:Create(botao, TweenInfo.new(0.15), {BackgroundTransparency = 0.15}):Play()
-    end)
-
-    botoes[i] = botao
+    local conteudo = Instance.new("Frame")
+    conteudo.Name = "Conteudo_" .. nomeAba
+    conteudo.Size = UDim2.new(1, 0, 1, 0)
+    conteudo.BackgroundTransparency = 1
+    conteudo.Visible = false
+    conteudo.Parent = areaConteudo
+    conteudosAba[nomeAba] = conteudo
 end
 
--- ============ MENU JOGAR ============
-local menuJogar = Instance.new("Frame")
-menuJogar.Name = "MenuJogar"
-menuJogar.Size = UDim2.new(1, -40, 1, -110)
-menuJogar.Position = UDim2.new(0, 20, 0, 95)
-menuJogar.BackgroundTransparency = 1
-menuJogar.Visible = false
-menuJogar.Parent = fundo
+-- ============ FUNÇÃO: CRIAR CHECKBOX ============
+local function criarCheckbox(parent, texto, posX, posY, largura, callback)
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(largura or 0.5, -10, 0, 28)
+    container.Position = UDim2.new(posX or 0, 10, 0, posY)
+    container.BackgroundTransparency = 1
+    container.Parent = parent
 
-local labelJogoDetectado = Instance.new("TextLabel")
-labelJogoDetectado.Name = "LabelJogo"
-labelJogoDetectado.Size = UDim2.new(1, 0, 0, 25)
-labelJogoDetectado.Position = UDim2.new(0, 0, 0, 0)
-labelJogoDetectado.BackgroundTransparency = 1
-labelJogoDetectado.Text = "🔍 Detectando..."
-labelJogoDetectado.TextColor3 = Color3.fromRGB(0, 255, 150)
-labelJogoDetectado.TextSize = 14
-labelJogoDetectado.Font = Enum.Font.GothamBold
-labelJogoDetectado.TextXAlignment = Enum.TextXAlignment.Left
-labelJogoDetectado.Parent = menuJogar
-
-local scrollFuncoes = Instance.new("ScrollingFrame")
-scrollFuncoes.Name = "ScrollFuncoes"
-scrollFuncoes.Size = UDim2.new(1, 0, 1, -80)
-scrollFuncoes.Position = UDim2.new(0, 0, 0, 35)
-scrollFuncoes.BackgroundTransparency = 1
-scrollFuncoes.BorderSizePixel = 0
-scrollFuncoes.ScrollBarThickness = 4
-scrollFuncoes.CanvasSize = UDim2.new(0, 0, 0, 0)
-scrollFuncoes.AutomaticCanvasSize = Enum.AutomaticSize.Y
-scrollFuncoes.Parent = menuJogar
-
-local layoutFuncoes = Instance.new("UIListLayout")
-layoutFuncoes.SortOrder = Enum.SortOrder.LayoutOrder
-layoutFuncoes.Padding = UDim.new(0, 8)
-layoutFuncoes.Parent = scrollFuncoes
-
-local botaoVoltarJogar = Instance.new("TextButton")
-botaoVoltarJogar.Name = "BotaoVoltarJogar"
-botaoVoltarJogar.Size = UDim2.new(1, 0, 0, 40)
-botaoVoltarJogar.Position = UDim2.new(0, 0, 1, -40)
-botaoVoltarJogar.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
-botaoVoltarJogar.BorderSizePixel = 0
-botaoVoltarJogar.Text = "← Voltar"
-botaoVoltarJogar.TextColor3 = Color3.fromRGB(255, 255, 255)
-botaoVoltarJogar.TextSize = 16
-botaoVoltarJogar.Font = Enum.Font.GothamBold
-botaoVoltarJogar.Parent = menuJogar
-
-local cantoVoltarJogar = Instance.new("UICorner")
-cantoVoltarJogar.CornerRadius = UDim.new(0, 8)
-cantoVoltarJogar.Parent = botaoVoltarJogar
-
--- ============ FUNÇÕES ============
-local function criarBotaoFuncao(info, index)
     local botao = Instance.new("TextButton")
-    botao.Name = "Funcao_" .. index
-    botao.Size = UDim2.new(1, 0, 0, 45)
-    botao.BackgroundColor3 = Color3.fromRGB(0, 180, 120)
-    botao.BackgroundTransparency = 0.15
+    botao.Size = UDim2.new(0, 18, 0, 18)
+    botao.Position = UDim2.new(0, 0, 0.5, -9)
+    botao.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     botao.BorderSizePixel = 0
-    botao.Text = info.nome
-    botao.TextColor3 = Color3.fromRGB(255, 255, 255)
-    botao.TextSize = 16
-    botao.Font = Enum.Font.GothamBold
+    botao.Text = ""
     botao.AutoButtonColor = false
-    botao.LayoutOrder = index
-    botao.Parent = scrollFuncoes
+    botao.Parent = container
 
     local canto = Instance.new("UICorner")
-    canto.CornerRadius = UDim.new(0, 8)
+    canto.CornerRadius = UDim.new(0, 3)
     canto.Parent = botao
 
     local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(255, 255, 255)
-    stroke.Thickness = 1
-    stroke.Transparency = 0.7
+    stroke.Color = Cores.roxo
+    stroke.Thickness = 2
     stroke.Parent = botao
 
-    botao.MouseEnter:Connect(function()
-        TweenService:Create(botao, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -25, 1, 0)
+    label.Position = UDim2.new(0, 25, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = texto
+    label.TextColor3 = Cores.texto
+    label.TextSize = 12
+    label.Font = Enum.Font.Gotham
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = container
+
+    local marcado = false
+    botao.MouseButton1Click:Connect(function()
+        marcado = not marcado
+        if marcado then
+            botao.BackgroundColor3 = Cores.roxo
+            botao.Text = "✓"
+            botao.TextColor3 = Cores.texto
+            botao.TextSize = 14
+            botao.Font = Enum.Font.GothamBold
+        else
+            botao.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            botao.Text = ""
+        end
+        if callback then callback(marcado) end
     end)
 
-    botao.MouseLeave:Connect(function()
-        TweenService:Create(botao, TweenInfo.new(0.15), {BackgroundTransparency = 0.15}):Play()
+    return {container = container, label = label, botao = botao, setTexto = function(t) label.Text = t end}
+end
+
+-- ============ FUNÇÃO: CRIAR SLIDER ============
+local function criarSlider(parent, texto, posX, posY, largura, valorInicial, min, max, callback)
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(largura or 1, -20, 0, 45)
+    container.Position = UDim2.new(posX or 0, 10, 0, posY)
+    container.BackgroundTransparency = 1
+    container.Parent = parent
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 0, 16)
+    label.BackgroundTransparency = 1
+    label.Text = texto .. ": " .. valorInicial
+    label.TextColor3 = Cores.texto
+    label.TextSize = 12
+    label.Font = Enum.Font.GothamBold
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = container
+
+    local fundoSlider = Instance.new("Frame")
+    fundoSlider.Size = UDim2.new(1, 0, 0, 8)
+    fundoSlider.Position = UDim2.new(0, 0, 0, 22)
+    fundoSlider.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    fundoSlider.BorderSizePixel = 0
+    fundoSlider.Parent = container
+
+    local cantoF = Instance.new("UICorner")
+    cantoF.CornerRadius = UDim.new(1, 0)
+    cantoF.Parent = fundoSlider
+
+    local preench = Instance.new("Frame")
+    preench.Size = UDim2.new((valorInicial - min) / (max - min), 0, 1, 0)
+    preench.BackgroundColor3 = Cores.roxo
+    preench.BorderSizePixel = 0
+    preench.Parent = fundoSlider
+
+    local cantoP = Instance.new("UICorner")
+    cantoP.CornerRadius = UDim.new(1, 0)
+    cantoP.Parent = preench
+
+    local botaoSlider = Instance.new("TextButton")
+    botaoSlider.Size = UDim2.new(0, 16, 0, 16)
+    botaoSlider.Position = UDim2.new((valorInicial - min) / (max - min), -8, 0.5, -8)
+    botaoSlider.BackgroundColor3 = Cores.texto
+    botaoSlider.BorderSizePixel = 0
+    botaoSlider.Text = ""
+    botaoSlider.Parent = fundoSlider
+
+    local cantoB = Instance.new("UICorner")
+    cantoB.CornerRadius = UDim.new(1, 0)
+    cantoB.Parent = botaoSlider
+
+    local arrastando = false
+
+    local function atualizar(input)
+        local posX = math.clamp(input.Position.X - fundoSlider.AbsolutePosition.X, 0, fundoSlider.AbsoluteSize.X)
+        local pct = posX / fundoSlider.AbsoluteSize.X
+        local valor = math.floor(min + (max - min) * pct)
+        preench.Size = UDim2.new(pct, 0, 1, 0)
+        botaoSlider.Position = UDim2.new(pct, -8, 0.5, -8)
+        label.Text = texto .. ": " .. valor
+        if callback then callback(valor) end
+    end
+
+    botaoSlider.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            arrastando = true
+        end
     end)
+
+    fundoSlider.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            arrastando = true
+            atualizar(input)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            arrastando = false
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if arrastando then
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                atualizar(input)
+            end
+        end
+    end)
+
+    return {label = label, setTexto = function(t) label.Text = t .. ": " .. math.floor(min + (max - min) * (botaoSlider.Position.X.Scale)) end}
+end
+
+-- ============ FUNÇÃO: CRIAR DROPDOWN ============
+local function criarDropdown(parent, texto, posX, posY, largura, opcoes, callback)
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(largura or 1, -20, 0, 50)
+    container.Position = UDim2.new(posX or 0, 10, 0, posY)
+    container.BackgroundTransparency = 1
+    container.ClipsDescendants = false
+    container.ZIndex = 10
+    container.Parent = parent
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 0, 16)
+    label.BackgroundTransparency = 1
+    label.Text = texto
+    label.TextColor3 = Cores.texto
+    label.TextSize = 12
+    label.Font = Enum.Font.GothamBold
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = container
+
+    local botao = Instance.new("TextButton")
+    botao.Size = UDim2.new(1, 0, 0, 25)
+    botao.Position = UDim2.new(0, 0, 0, 20)
+    botao.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    botao.BorderSizePixel = 0
+    botao.Text = opcoes[1] or "..."
+    botao.TextColor3 = Cores.texto
+    botao.TextSize = 12
+    botao.Font = Enum.Font.Gotham
+    botao.ZIndex = 11
+    botao.Parent = container
+
+    local cantoB = Instance.new("UICorner")
+    cantoB.CornerRadius = UDim.new(0, 4)
+    cantoB.Parent = botao
+
+    local lista = Instance.new("Frame")
+    lista.Size = UDim2.new(1, 0, 0, #opcoes * 25)
+    lista.Position = UDim2.new(0, 0, 1, 0)
+    lista.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    lista.BorderSizePixel = 0
+    lista.Visible = false
+    lista.ZIndex = 12
+    lista.Parent = container
+
+    local cantoL = Instance.new("UICorner")
+    cantoL.CornerRadius = UDim.new(0, 4)
+    cantoL.Parent = lista
+
+    local aberto = false
+
+    for i, opcao in ipairs(opcoes) do
+        local item = Instance.new("TextButton")
+        item.Size = UDim2.new(1, 0, 0, 25)
+        item.Position = UDim2.new(0, 0, 0, (i - 1) * 25)
+        item.BackgroundTransparency = 1
+        item.Text = opcao
+        item.TextColor3 = Cores.texto
+        item.TextSize = 12
+        item.Font = Enum.Font.Gotham
+        item.ZIndex = 13
+        item.Parent = lista
+
+        item.MouseButton1Click:Connect(function()
+            botao.Text = opcao
+            lista.Visible = false
+            aberto = false
+            if callback then callback(opcao) end
+        end)
+
+        item.MouseEnter:Connect(function()
+            item.BackgroundTransparency = 0.7
+            item.BackgroundColor3 = Cores.roxo
+        end)
+
+        item.MouseLeave:Connect(function()
+            item.BackgroundTransparency = 1
+        end)
+    end
 
     botao.MouseButton1Click:Connect(function()
-        local sucesso, erro = pcall(info.acao)
-        if not sucesso then
-            print("[Best Script] Erro: " .. tostring(erro))
-        end
+        aberto = not aberto
+        lista.Visible = aberto
     end)
+
+    return {container = container, label = label}
 end
 
-local function carregarMenuJogar()
-    for _, filho in ipairs(scrollFuncoes:GetChildren()) do
-        if filho:IsA("TextButton") then
-            filho:Destroy()
-        end
-    end
+-- ============ ABA AIM ============
+local abaAIM = conteudosAba["AIM"]
 
-    local placeId = game.PlaceId
-    local jogoInfo = JogosSuportados[placeId]
-    local funcoes = {}
+criarCheckbox(abaAIM, T("ativarAimbot"), 0, 10, 0.5, function(m) Config.aimbotAtivo = m end)
+criarCheckbox(abaAIM, T("silentAim"), 0.5, 10, 0.5, function(m) Config.silentAimAtivo = m end)
+criarCheckbox(abaAIM, T("aimVisible"), 0, 45, 0.5, function(m) Config.aimVisible = m end)
+criarCheckbox(abaAIM, T("aimTiro"), 0.5, 45, 0.5, function(m) Config.aimTiro = m end)
+criarCheckbox(abaAIM, T("aimMira"), 0, 80, 0.5, function(m) Config.aimMira = m end)
 
-    if jogoInfo then
-        labelJogoDetectado.Text = "🎮 " .. jogoInfo.nome .. " (ID: " .. placeId .. ")"
-        labelJogoDetectado.TextColor3 = Color3.fromRGB(0, 255, 150)
+criarSlider(abaAIM, "FOV", 0, 120, 1, 90, 0, 180, function(v) Config.aimFov = v end)
 
-        for _, funcao in ipairs(jogoInfo.funcoes) do
-            table.insert(funcoes, funcao)
-        end
+criarDropdown(abaAIM, T("parteAimbot"), 0, 175, 0.5, {"Head", "Torso", "Random"}, function(v) Config.parteAimbot = v end)
+criarDropdown(abaAIM, T("parteSilent"), 0.5, 175, 0.5, {"Head", "Torso", "Random"}, function(v) Config.parteSilent = v end)
+
+-- ============ ABA ESP ============
+local abaESP = conteudosAba["ESP"]
+
+criarCheckbox(abaESP, "ESP", 0, 10, 0.5, function(m) Config.espAtivo = m end)
+criarCheckbox(abaESP, T("espVida"), 0.5, 10, 0.5, function(m) Config.espVida = m end)
+criarCheckbox(abaESP, T("espLinha"), 0, 45, 0.5, function(m) Config.espLinha = m end)
+criarCheckbox(abaESP, T("espCaixa"), 0.5, 45, 0.5, function(m) Config.espCaixa = m end)
+criarCheckbox(abaESP, T("espNome"), 0, 80, 0.5, function(m) Config.espNome = m end)
+criarCheckbox(abaESP, T("espDistancia"), 0.5, 80, 0.5, function(m) Config.espDistancia = m end)
+
+criarDropdown(abaESP, T("posicaoLinha"), 0, 120, 0.5, {T("topoTela"), T("meioTela"), T("baixoTela")}, function(v)
+    if v == T("topoTela") then Config.posicaoLinha = "Topo"
+    elseif v == T("baixoTela") then Config.posicaoLinha = "Baixo"
+    else Config.posicaoLinha = "Meio" end
+end)
+
+criarDropdown(abaESP, T("corEsp"), 0.5, 120, 0.5, {"Vermelho", "Verde", "Azul", "Amarelo", "Roxo", "Rosa", "Branco"}, function(v)
+    if v == "Vermelho" then Config.corEsp = Color3.fromRGB(255, 0, 0)
+    elseif v == "Verde" then Config.corEsp = Color3.fromRGB(0, 255, 0)
+    elseif v == "Azul" then Config.corEsp = Color3.fromRGB(0, 150, 255)
+    elseif v == "Amarelo" then Config.corEsp = Color3.fromRGB(255, 255, 0)
+    elseif v == "Roxo" then Config.corEsp = Color3.fromRGB(150, 0, 255)
+    elseif v == "Rosa" then Config.corEsp = Color3.fromRGB(255, 100, 200)
+    elseif v == "Branco" then Config.corEsp = Color3.fromRGB(255, 255, 255) end
+end)
+
+-- ============ ABA CFG ============
+local abaCFG = conteudosAba["CFG"]
+
+criarDropdown(abaCFG, T("lingua"), 0, 10, 1, {"PT", "EN", "ES"}, function(v)
+    if v == "PT" then idiomaAtual = "pt"
+    elseif v == "EN" then idiomaAtual = "en"
+    else idiomaAtual = "es" end
+end)
+
+criarDropdown(abaCFG, T("corPainel"), 0, 75, 1, {"Roxo", "Verde", "Azul", "Vermelho", "Laranja", "Rosa", "Ciano"}, function(v)
+    if v == "Roxo" then Config.corPainel = Color3.fromRGB(120, 0, 200)
+    elseif v == "Verde" then Config.corPainel = Color3.fromRGB(0, 180, 100)
+    elseif v == "Azul" then Config.corPainel = Color3.fromRGB(0, 120, 220)
+    elseif v == "Vermelho" then Config.corPainel = Color3.fromRGB(200, 30, 30)
+    elseif v == "Laranja" then Config.corPainel = Color3.fromRGB(230, 120, 0)
+    elseif v == "Rosa" then Config.corPainel = Color3.fromRGB(220, 50, 150)
+    elseif v == "Ciano" then Config.corPainel = Color3.fromRGB(0, 200, 200) end
+    
+    -- Aplica a cor no painel
+        header.BackgroundColor3 = Config.corPainel
+    bordaPainel.Color = Config.corPainel
+end)
+
+local rainbowBtn = criarCheckbox(abaCFG, T("rainbow") .. ": " .. T("rainbowOff"), 0, 140, 1, function(m)
+    Config.rainbow = m
+    if m then
+        rainbowBtn.setTexto(T("rainbow") .. ": " .. T("rainbowOn"))
     else
-        labelJogoDetectado.Text = "⚠️ Jogo não reconhecido (ID: " .. placeId .. ")"
-        labelJogoDetectado.TextColor3 = Color3.fromRGB(255, 180, 0)
+        rainbowBtn.setTexto(T("rainbow") .. ": " .. T("rainbowOff"))
+        header.BackgroundColor3 = Config.corPainel
+        bordaPainel.Color = Config.corPainel
     end
+end)
 
-    for _, funcao in ipairs(FuncoesUniversais) do
-        table.insert(funcoes, funcao)
+-- ============ ABA INFO ============
+local abaINFO = conteudosAba["INFO"]
+
+local infoLabel = Instance.new("TextLabel")
+infoLabel.Size = UDim2.new(1, -20, 1, -20)
+infoLabel.Position = UDim2.new(0, 10, 0, 10)
+infoLabel.BackgroundTransparency = 1
+infoLabel.Text = "FFH4X\nVersão: 2.0\nFeito por: Ewerton\n\nUse com responsabilidade."
+infoLabel.TextColor3 = Cores.texto
+infoLabel.TextSize = 14
+infoLabel.Font = Enum.Font.Gotham
+infoLabel.TextXAlignment = Enum.TextXAlignment.Left
+infoLabel.TextYAlignment = Enum.TextYAlignment.Top
+infoLabel.Parent = abaINFO
+
+-- ============ TROCAR ABA ============
+local function trocarAba(nomeAba)
+    for nome, conteudo in pairs(conteudosAba) do
+        conteudo.Visible = (nome == nomeAba)
     end
-
-    for i, funcao in ipairs(funcoes) do
-        criarBotaoFuncao(funcao, i)
+    for nome, botao in pairs(botoesAba) do
+        if nome == nomeAba then
+            botao.BackgroundTransparency = 0.1
+            botao.TextColor3 = Cores.roxoClaro
+        else
+            botao.BackgroundTransparency = 0.3
+            botao.TextColor3 = Cores.texto
+        end
     end
 end
 
--- ============ NAVEGAÇÃO ============
-local function mostrarPrincipal()
-    menuJogar.Visible = false
-    menuPrincipal.Visible = true
-    menuPrincipal.Position = UDim2.new(0, 30, 0, 95)
-    TweenService:Create(menuPrincipal, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Position = UDim2.new(0, 20, 0, 95)
-    }):Play()
+for nome, botao in pairs(botoesAba) do
+    botao.MouseButton1Click:Connect(function() trocarAba(nome) end)
 end
 
-local function mostrarJogar()
-    carregarMenuJogar()
-    menuPrincipal.Visible = false
-    menuJogar.Visible = true
-    menuJogar.Position = UDim2.new(0, 30, 0, 95)
-    TweenService:Create(menuJogar, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Position = UDim2.new(0, 20, 0, 95)
-    }):Play()
-end
+trocarAba("AIM")
 
--- ============ FECHAR GUI ============
-local function fecharGui()
-    TweenService:Create(container, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-        Position = UDim2.new(0.5, 0, 1.5, 0)
-    }):Play()
-    task.wait(0.45)
+-- ============ MINIMIZAR ============
+botaoMinimizar.MouseButton1Click:Connect(function()
+    if menuLateral.Visible then
+        menuLateral.Visible = false
+        areaConteudo.Visible = false
+        painel.Size = UDim2.new(0, 520, 0, 30)
+        botaoMinimizar.Text = "▲"
+    else
+        menuLateral.Visible = true
+        areaConteudo.Visible = true
+        painel.Size = UDim2.new(0, 520, 0, 340)
+        botaoMinimizar.Text = "▼"
+    end
+end)
+
+botaoFechar.MouseButton1Click:Connect(function()
     gui:Destroy()
+end)
+
+-- ============ RAINBOW ============
+local hue = 0
+RunService.Heartbeat:Connect(function(dt)
+    if Config.rainbow then
+        hue = (hue + dt * 0.3) % 1
+        local cor = Color3.fromHSV(hue, 1, 1)
+        header.BackgroundColor3 = cor
+        bordaPainel.Color = cor
+    else
+        header.BackgroundColor3 = Config.corPainel
+        bordaPainel.Color = Config.corPainel
+    end
+end)
+
+-- ============ ESP ============
+local espCache = {}
+
+local function criarESP(jogador)
+    if jogador == LocalPlayer then return end
+    if espCache[jogador] then return end
+
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "ESP_HL"
+    highlight.FillColor = Config.corEsp
+    highlight.FillTransparency = 0.5
+    highlight.OutlineColor = Config.corEsp
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.Adornee = jogador.Character
+    highlight.Parent = gui
+
+    local billboard = Instance.new("BillboardGui")
+    billboard.Size = UDim2.new(0, 200, 0, 60)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Adornee = jogador.Character and jogador.Character:FindFirstChild("Head")
+
+    local nomeLabel = Instance.new("TextLabel")
+    nomeLabel.Size = UDim2.new(1, 0, 0.33, 0)
+    nomeLabel.BackgroundTransparency = 1
+    nomeLabel.Text = jogador.Name
+    nomeLabel.TextColor3 = Config.corEsp
+    nomeLabel.TextStrokeTransparency = 0
+    nomeLabel.TextSize = 14
+    nomeLabel.Font = Enum.Font.GothamBold
+    nomeLabel.Parent = billboard
+
+    local distLabel = Instance.new("TextLabel")
+    distLabel.Size = UDim2.new(1, 0, 0.33, 0)
+    distLabel.Position = UDim2.new(0, 0, 0.33, 0)
+    distLabel.BackgroundTransparency = 1
+    distLabel.Text = "0"
+    distLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    distLabel.TextStrokeTransparency = 0
+    distLabel.TextSize = 12
+    distLabel.Font = Enum.Font.Gotham
+    distLabel.Parent = billboard
+
+    local vidaLabel = Instance.new("TextLabel")
+    vidaLabel.Size = UDim2.new(1, 0, 0.33, 0)
+    vidaLabel.Position = UDim2.new(0, 0, 0.66, 0)
+    vidaLabel.BackgroundTransparency = 1
+    vidaLabel.Text = "100 HP"
+    vidaLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    vidaLabel.TextStrokeTransparency = 0
+    vidaLabel.TextSize = 12
+    vidaLabel.Font = Enum.Font.Gotham
+    vidaLabel.Parent = billboard
+
+    billboard.Parent = gui
+
+    espCache[jogador] = {
+        highlight = highlight,
+        billboard = billboard,
+        nome = nomeLabel,
+        distancia = distLabel,
+        vida = vidaLabel
+    }
 end
 
--- ============ EVENTOS DOS BOTÕES ============
-botoes[1].MouseButton1Click:Connect(mostrarJogar)
-botoes[2].MouseButton1Click:Connect(function()
-    print("[Best Script] Config clicado")
-end)
-botoes[3].MouseButton1Click:Connect(fecharGui)
-botaoFechar.MouseButton1Click:Connect(fecharGui)
-botaoVoltarJogar.MouseButton1Click:Connect(mostrarPrincipal)
-
--- ============ ARRASTAR JANELA ============
-barraTitulo.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        arrastando = true
-        offsetInicial = input.Position - container.AbsolutePosition
+local function removerESP(jogador)
+    if espCache[jogador] then
+        if espCache[jogador].highlight then espCache[jogador].highlight:Destroy() end
+        if espCache[jogador].billboard then espCache[jogador].billboard:Destroy() end
+        espCache[jogador] = nil
     end
-end)
+end
 
-UserInputService.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        arrastando = false
+-- ============ LINHAS DO ESP ============
+local linhasCache = {}
+
+local function atualizarLinhas()
+    for jogador, linha in pairs(linhasCache) do
+        if linha then linha:Destroy() end
+        linhasCache[jogador] = nil
     end
-end)
 
-UserInputService.InputChanged:Connect(function(input)
-    if arrastando and offsetInicial then
-        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-            container.Position = UDim2.new(0, input.Position.X - offsetInicial.X, 0, input.Position.Y - offsetInicial.Y)
+    if not Config.espLinha then return end
+
+    local camera = workspace.CurrentCamera
+    local viewport = camera.ViewportSize
+
+    local yPos = viewport.Y / 2
+    if Config.posicaoLinha == "Topo" then yPos = 50
+    elseif Config.posicaoLinha == "Baixo" then yPos = viewport.Y - 50 end
+
+    for _, jogador in ipairs(Players:GetPlayers()) do
+        if jogador ~= LocalPlayer and jogador.Character then
+            local head = jogador.Character:FindFirstChild("Head")
+            if head then
+                local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
+                if onScreen then
+                    local linha = Instance.new("Frame")
+                    linha.Size = UDim2.new(0, 2, 0, math.abs(yPos - screenPos.Y))
+                    linha.Position = UDim2.new(0, screenPos.X, 0, math.min(yPos, screenPos.Y))
+                    linha.BackgroundColor3 = Config.corEsp
+                    linha.BorderSizePixel = 0
+                    linha.ZIndex = 5
+                    linha.Parent = gui
+                    linhasCache[jogador] = linha
+                end
+            end
+        end
+    end
+end
+
+-- ============ AIMBOT ============
+local function pegarAlvo(parte)
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
+
+    local minhaPos = char.HumanoidRootPart.Position
+    local camera = workspace.CurrentCamera
+    local centroTela = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
+    local maxDist = Config.aimFov
+
+    local melhor = nil
+    local menorDist = math.huge
+
+    for _, jogador in ipairs(Players:GetPlayers()) do
+        if jogador ~= LocalPlayer and jogador.Character then
+            local humanoid = jogador.Character:FindFirstChild("Humanoid")
+            local hrp = jogador.Character:FindFirstChild("HumanoidRootPart")
+            local head = jogador.Character:FindFirstChild("Head")
+
+            local parteAlvo = nil
+            if parte == "Head" then parteAlvo = head
+            elseif parte == "Torso" then parteAlvo = hrp
+            else
+                local partes = {head, hrp}
+                parteAlvo = partes[math.random(1, #partes)]
+            end
+
+            if humanoid and hrp and parteAlvo and humanoid.Health > 0 then
+                local screenPos, onScreen = camera:WorldToViewportPoint(parteAlvo.Position)
+                if onScreen then
+                    local distTela = (Vector2.new(screenPos.X, screenPos.Y) - centroTela).Magnitude
+                    if distTela < menorDist and distTela < maxDist * 5 then
+                        menorDist = distTela
+                        melhor = parteAlvo
+                    end
+                end
+            end
+        end
+    end
+
+    return melhor
+end
+
+RunService.RenderStepped:Connect(function()
+    if Config.aimbotAtivo then
+        local alvo = pegarAlvo(Config.parteAimbot)
+        if alvo then
+            local targetCF = CFrame.new(Camera.CFrame.Position, alvo.Position)
+            Camera.CFrame = Camera.CFrame:Lerp(targetCF, 0.2)
         end
     end
 end)
 
--- ============ ANIMAÇÃO DE ENTRADA ============
-container.Position = UDim2.new(0.5, 0, 1.5, 0)
-fundo.BackgroundTransparency = 1
-barraTitulo.BackgroundTransparency = 1
-titulo.TextTransparency = 1
-autor.TextTransparency = 1
-botaoFechar.BackgroundTransparency = 1
-botaoFechar.TextTransparency = 1
+-- ============ LOOP PRINCIPAL DO ESP ============
+RunService.RenderStepped:Connect(function()
+    if Config.espAtivo then
+        for _, jogador in ipairs(Players:GetPlayers()) do
+            if jogador ~= LocalPlayer and jogador.Character and jogador.Character:FindFirstChild("HumanoidRootPart") then
+                if not espCache[jogador] then
+                    criarESP(jogador)
+                end
 
-for _, b in ipairs(botoes) do
-    b.BackgroundTransparency = 1
-    b.TextTransparency = 1
-end
+                local cache = espCache[jogador]
+                if cache then
+                    cache.highlight.Adornee = jogador.Character
+                    cache.highlight.FillColor = Config.corEsp
+                    cache.highlight.OutlineColor = Config.corEsp
+                    cache.billboard.Adornee = jogador.Character:FindFirstChild("Head")
+                    cache.nome.Visible = Config.espNome
+                    cache.nome.TextColor3 = Config.corEsp
+                    cache.distancia.Visible = Config.espDistancia
+                    cache.vida.Visible = Config.espVida
 
-task.wait(0.2)
+                    local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        local dist = (jogador.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
+                        cache.distancia.Text = math.floor(dist) .. " studs"
+                    end
 
-TweenService:Create(container, TweenInfo.new(0.8, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-    Position = UDim2.new(0.5, 0, 0.5, 0)
-}):Play()
+                    local hum = jogador.Character:FindFirstChild("Humanoid")
+                    if hum then
+                        cache.vida.Text = math.floor(hum.Health) .. " HP"
+                    end
+                end
+            end
+        end
+        atualizarLinhas()
+    else
+        for jogador, _ in pairs(espCache) do
+            removerESP(jogador)
+        end
+        for jogador, linha in pairs(linhasCache) do
+            if linha then linha:Destroy() end
+            linhasCache[jogador] = nil
+        end
+    end
+end)
 
-task.wait(0.4)
+Players.PlayerRemoving:Connect(function(jogador)
+    removerESP(jogador)
+end)
 
-TweenService:Create(fundo, TweenInfo.new(0.4), {BackgroundTransparency = 0.05}):Play()
-TweenService:Create(barraTitulo, TweenInfo.new(0.4), {BackgroundTransparency = 0.15}):Play()
-TweenService:Create(titulo, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
-TweenService:Create(botaoFechar, TweenInfo.new(0.4), {BackgroundTransparency = 0, TextTransparency = 0}):Play()
-TweenService:Create(autor, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
-
-task.wait(0.3)
-
-for _, b in ipairs(botoes) do
-    TweenService:Create(b, TweenInfo.new(0.3), {
-        BackgroundTransparency = 0.15,
-        TextTransparency = 0
-    }):Play()
-    task.wait(0.08)
-end
-
-print("[Best Script] GUI v1.2 carregada! Jogo: " .. game.PlaceId)
+print("[FFH4X] v2.0 carregado! Feito por Ewerton")
