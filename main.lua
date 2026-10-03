@@ -1,24 +1,17 @@
---[[
-    FFH4X - Painel Roblox v3.0
-    Feito por Ewerton
-]]
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
+local Lighting = game:GetService("Lighting")
 local Camera = workspace.CurrentCamera
-local HttpService = game:GetService("HttpService")
 
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
--- ============ LIMPAR GUI ANTIGA ============
 if CoreGui:FindFirstChild("FFH4X") then
     CoreGui.FFH4X:Destroy()
 end
 
--- ============ TEXTOS POR IDIOMA ============
 local Textos = {
     pt = {
         aim = "AIM", esp = "ESP", cfg = "CFG", exploits = "HACKS", info = "INFO",
@@ -28,6 +21,7 @@ local Textos = {
         aimTiro = "Aim Tiro",
         aimMira = "Aim Mira",
         mostrarFov = "Mostrar FOV",
+        autoShoot = "Auto Shoot (PERIGOSO)",
         regularFov = "Regular FOV",
         parteAimbot = "Parte do Aimbot",
         parteSilent = "Parte do Silent Aim",
@@ -39,22 +33,25 @@ local Textos = {
         espRainbow = "ESP Rainbow",
         corEsp = "Cor do ESP",
         posicaoLinha = "Posição da Linha",
-        topoTela = "Topo da Tela",
-        meioTela = "Meio da Tela",
-        baixoTela = "Baixo da Tela",
+        topoTela = "Topo",
+        meioTela = "Meio",
+        baixoTela = "Baixo",
         corPainel = "Cor do Painel",
         rainbow = "Modo Rainbow",
         rainbowOn = "ATIVADO",
         rainbowOff = "DESATIVADO",
         lingua = "Língua",
-        info = "INFO",
         spinbot = "Spinbot",
         speed = "Speed",
         fly = "Fly Mobile",
-        aimkill = "Aimkill (PERIGOSO - BAN)",
         ghost = "Ghost",
         teleport = "Teleport",
-        infoTexto = "FFH4X\nVersão: 3.0\nFeito por: Ewerton\n\nUse com responsabilidade."
+        fullbright = "Fullbright",
+        nofog = "No Fog",
+        infinitejump = "Infinite Jump",
+        antiafk = "Anti-AFK",
+        waterwalk = "Walk on Water",
+        infoTexto = "FFH4X v6.0\nFeito por: Ewerton\n\nUse com responsabilidade."
     },
     en = {
         aim = "AIM", esp = "ESP", cfg = "CFG", exploits = "HACKS", info = "INFO",
@@ -64,6 +61,7 @@ local Textos = {
         aimTiro = "Aim Shot",
         aimMira = "Aim Scope",
         mostrarFov = "Show FOV",
+        autoShoot = "Auto Shoot (DANGEROUS)",
         regularFov = "Adjust FOV",
         parteAimbot = "Aimbot Part",
         parteSilent = "Silent Aim Part",
@@ -75,22 +73,25 @@ local Textos = {
         espRainbow = "ESP Rainbow",
         corEsp = "ESP Color",
         posicaoLinha = "Line Position",
-        topoTela = "Top of Screen",
-        meioTela = "Middle of Screen",
-        baixoTela = "Bottom of Screen",
+        topoTela = "Top",
+        meioTela = "Middle",
+        baixoTela = "Bottom",
         corPainel = "Panel Color",
         rainbow = "Rainbow Mode",
         rainbowOn = "ENABLED",
         rainbowOff = "DISABLED",
         lingua = "Language",
-        info = "INFO",
         spinbot = "Spinbot",
         speed = "Speed",
         fly = "Fly Mobile",
-        aimkill = "Aimkill (DANGEROUS - BAN)",
         ghost = "Ghost",
         teleport = "Teleport",
-        infoTexto = "FFH4X\nVersion: 3.0\nMade by: Ewerton\n\nUse responsibly."
+        fullbright = "Fullbright",
+        nofog = "No Fog",
+        infinitejump = "Infinite Jump",
+        antiafk = "Anti-AFK",
+        waterwalk = "Walk on Water",
+        infoTexto = "FFH4X v6.0\nMade by: Ewerton\n\nUse responsibly."
     },
     es = {
         aim = "AIM", esp = "ESP", cfg = "CFG", exploits = "HACKS", info = "INFO",
@@ -100,6 +101,7 @@ local Textos = {
         aimTiro = "Aim Disparo",
         aimMira = "Aim Mira",
         mostrarFov = "Mostrar FOV",
+        autoShoot = "Auto Shoot (PELIGROSO)",
         regularFov = "Ajustar FOV",
         parteAimbot = "Parte del Aimbot",
         parteSilent = "Parte del Silent Aim",
@@ -111,22 +113,25 @@ local Textos = {
         espRainbow = "ESP Arcoíris",
         corEsp = "Color del ESP",
         posicaoLinha = "Posición de Línea",
-        topoTela = "Parte Superior",
-        meioTela = "Centro de Pantalla",
-        baixoTela = "Parte Inferior",
+        topoTela = "Superior",
+        meioTela = "Centro",
+        baixoTela = "Inferior",
         corPainel = "Color del Panel",
         rainbow = "Modo Arcoíris",
         rainbowOn = "ACTIVADO",
         rainbowOff = "DESACTIVADO",
         lingua = "Idioma",
-        info = "INFO",
         spinbot = "Spinbot",
         speed = "Speed",
         fly = "Fly Mobile",
-        aimkill = "Aimkill (PELIGROSO - BAN)",
         ghost = "Ghost",
         teleport = "Teleport",
-        infoTexto = "FFH4X\nVersión: 3.0\nHecho por: Ewerton\n\nUsar con responsabilidad."
+        fullbright = "Fullbright",
+        nofog = "No Fog",
+        infinitejump = "Infinite Jump",
+        antiafk = "Anti-AFK",
+        waterwalk = "Walk on Water",
+        infoTexto = "FFH4X v6.0\nHecho por: Ewerton\n\nUsar con responsabilidad."
     }
 }
 
@@ -136,7 +141,6 @@ local function T(chave)
     return Textos[idiomaAtual][chave] or chave
 end
 
--- ============ CONFIGURAÇÕES ============
 local Config = {
     aimbotAtivo = false,
     silentAimAtivo = false,
@@ -144,10 +148,10 @@ local Config = {
     aimTiro = false,
     aimMira = false,
     mostrarFov = false,
+    autoShoot = false,
     aimFov = 90,
     parteAimbot = "Head",
     parteSilent = "Head",
-
     espAtivo = false,
     espVida = false,
     espLinha = false,
@@ -157,18 +161,19 @@ local Config = {
     espRainbow = false,
     corEsp = Color3.fromRGB(255, 0, 0),
     posicaoLinha = "Meio",
-
     corPainel = Color3.fromRGB(120, 0, 200),
     rainbow = false,
-
     spinbot = false,
     speed = false,
     fly = false,
-    aimkill = false,
-    ghost = false
+    ghost = false,
+    fullbright = false,
+    nofog = false,
+    infinitejump = false,
+    antiafk = false,
+    waterwalk = false
 }
 
--- ============ CORES ============
 local Cores = {
     roxo = Config.corPainel,
     roxoEscuro = Color3.fromRGB(40, 5, 70),
@@ -176,10 +181,10 @@ local Cores = {
     fundo = Color3.fromRGB(25, 5, 45),
     fundoAba = Color3.fromRGB(45, 10, 75),
     texto = Color3.fromRGB(255, 255, 255),
-    cinza = Color3.fromRGB(180, 180, 180)
+    cinza = Color3.fromRGB(180, 180, 180),
+    verde = Color3.fromRGB(0, 200, 0)
 }
 
--- ============ GUI PRINCIPAL ============
 local gui = Instance.new("ScreenGui")
 gui.Name = "FFH4X"
 gui.ResetOnSpawn = false
@@ -189,8 +194,8 @@ gui.Parent = CoreGui
 
 local painel = Instance.new("Frame")
 painel.Name = "Painel"
-painel.Size = UDim2.new(0, 520, 0, 340)
-painel.Position = UDim2.new(0.5, -260, 0.5, -170)
+painel.Size = UDim2.new(0, 520, 0, 380)
+painel.Position = UDim2.new(0.5, -260, 0.5, -190)
 painel.BackgroundColor3 = Cores.fundo
 painel.BorderSizePixel = 0
 painel.Active = true
@@ -206,7 +211,6 @@ bordaPainel.Color = Cores.roxo
 bordaPainel.Thickness = 2
 bordaPainel.Parent = painel
 
--- ============ HEADER ============
 local header = Instance.new("Frame")
 header.Name = "Header"
 header.Size = UDim2.new(1, 0, 0, 30)
@@ -259,7 +263,6 @@ botaoFechar.TextSize = 14
 botaoFechar.Font = Enum.Font.GothamBold
 botaoFechar.Parent = header
 
--- ============ MENU LATERAL ============
 local menuLateral = Instance.new("Frame")
 menuLateral.Name = "MenuLateral"
 menuLateral.Size = UDim2.new(0, 80, 1, -30)
@@ -303,8 +306,59 @@ for i, nomeAba in ipairs(abas) do
     conteudosAba[nomeAba] = conteudo
 end
 
--- ============ FUNÇÃO: CRIAR CHECKBOX ============
-local function criarCheckbox(parent, texto, posX, posY, largura, callback)
+local botoesFlutuantes = {}
+local posicaoFlutuanteY = 100
+
+local function criarBotaoFlutuante(nomeCurto, callback)
+    if botoesFlutuantes[nomeCurto] then
+        botoesFlutuantes[nomeCurto]:Destroy()
+        botoesFlutuantes[nomeCurto] = nil
+        return nil
+    end
+
+    local botao = Instance.new("TextButton")
+    botao.Name = "Float_" .. nomeCurto
+    botao.Size = UDim2.new(0, 55, 0, 55)
+    botao.Position = UDim2.new(0, 20, 0, posicaoFlutuanteY)
+    botao.BackgroundColor3 = Cores.roxo
+    botao.BackgroundTransparency = 0.2
+    botao.BorderSizePixel = 0
+    botao.Text = nomeCurto
+    botao.TextColor3 = Cores.texto
+    botao.TextSize = 10
+    botao.Font = Enum.Font.GothamBold
+    botao.Active = true
+    botao.Draggable = true
+    botao.Parent = gui
+
+    posicaoFlutuanteY = posicaoFlutuanteY + 65
+
+    local canto = Instance.new("UICorner")
+    canto.CornerRadius = UDim.new(1, 0)
+    canto.Parent = botao
+
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Cores.texto
+    stroke.Thickness = 2
+    stroke.Transparency = 0.5
+    stroke.Parent = botao
+
+    local marcado = false
+    botao.MouseButton1Click:Connect(function()
+        marcado = not marcado
+        if marcado then
+            botao.BackgroundColor3 = Cores.verde
+        else
+            botao.BackgroundColor3 = Cores.roxo
+        end
+        if callback then callback(marcado) end
+    end)
+
+    botoesFlutuantes[nomeCurto] = botao
+    return botao
+end
+
+local function criarCheckbox(parent, texto, posX, posY, largura, callback, botaoNome)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(largura or 0.5, -10, 0, 28)
     container.Position = UDim2.new(posX or 0, 10, 0, posY)
@@ -329,8 +383,9 @@ local function criarCheckbox(parent, texto, posX, posY, largura, callback)
     stroke.Thickness = 2
     stroke.Parent = botao
 
+    local labelLargura = botaoNome and 0.7 or 1
     local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, -25, 1, 0)
+    label.Size = UDim2.new(labelLargura, -25, 1, 0)
     label.Position = UDim2.new(0, 25, 0, 0)
     label.BackgroundTransparency = 1
     label.Text = texto
@@ -341,6 +396,47 @@ local function criarCheckbox(parent, texto, posX, posY, largura, callback)
     label.Parent = container
 
     local marcado = false
+
+    if botaoNome then
+        local botaoFloat = Instance.new("TextButton")
+        botaoFloat.Size = UDim2.new(0, 22, 0, 22)
+        botaoFloat.Position = UDim2.new(1, -25, 0.5, -11)
+        botaoFloat.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+        botaoFloat.BorderSizePixel = 0
+        botaoFloat.Text = "+"
+        botaoFloat.TextColor3 = Cores.texto
+        botaoFloat.TextSize = 14
+        botaoFloat.Font = Enum.Font.GothamBold
+        botaoFloat.Parent = container
+
+        local cantoBF = Instance.new("UICorner")
+        cantoBF.CornerRadius = UDim.new(0, 4)
+        cantoBF.Parent = botaoFloat
+
+        botaoFloat.MouseButton1Click:Connect(function()
+            local float = criarBotaoFlutuante(botaoNome, function(estado)
+                marcado = estado
+                if marcado then
+                    botao.BackgroundColor3 = Cores.roxo
+                    botao.Text = "✓"
+                    botao.TextSize = 14
+                    botao.Font = Enum.Font.GothamBold
+                else
+                    botao.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                    botao.Text = ""
+                end
+                if callback then callback(marcado) end
+            end)
+            if float then
+                botaoFloat.Text = "−"
+                botaoFloat.BackgroundColor3 = Cores.roxo
+            else
+                botaoFloat.Text = "+"
+                botaoFloat.BackgroundColor3 = Color3.fromRGB(60, 60, 80)
+            end
+        end)
+    end
+
     botao.MouseButton1Click:Connect(function()
         marcado = not marcado
         if marcado then
@@ -356,10 +452,9 @@ local function criarCheckbox(parent, texto, posX, posY, largura, callback)
         if callback then callback(marcado) end
     end)
 
-    return {container = container, label = label, botao = botao, setTexto = function(t) label.Text = t end}
+    return {container = container, label = label, botao = botao}
 end
 
--- ============ FUNÇÃO: CRIAR SLIDER ============
 local function criarSlider(parent, texto, posX, posY, largura, valorInicial, min, max, callback)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(largura or 1, -20, 0, 45)
@@ -452,7 +547,6 @@ local function criarSlider(parent, texto, posX, posY, largura, valorInicial, min
     return {label = label}
 end
 
--- ============ FUNÇÃO: CRIAR DROPDOWN ============
 local function criarDropdown(parent, texto, posX, posY, largura, opcoes, callback)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(largura or 1, -20, 0, 50)
@@ -540,31 +634,30 @@ local function criarDropdown(parent, texto, posX, posY, largura, opcoes, callbac
     return {container = container, label = label}
 end
 
--- ============ ABA AIM ============
 local abaAIM = conteudosAba["AIM"]
 
-criarCheckbox(abaAIM, T("ativarAimbot"), 0, 10, 0.5, function(m) Config.aimbotAtivo = m end)
-criarCheckbox(abaAIM, T("silentAim"), 0.5, 10, 0.5, function(m) Config.silentAimAtivo = m end)
-criarCheckbox(abaAIM, T("aimVisible"), 0, 45, 0.5, function(m) Config.aimVisible = m end)
-criarCheckbox(abaAIM, T("aimTiro"), 0.5, 45, 0.5, function(m) Config.aimTiro = m end)
-criarCheckbox(abaAIM, T("aimMira"), 0, 80, 0.5, function(m) Config.aimMira = m end)
-criarCheckbox(abaAIM, T("mostrarFov"), 0.5, 80, 0.5, function(m) Config.mostrarFov = m end)
+criarCheckbox(abaAIM, T("ativarAimbot"), 0, 10, 0.5, function(m) Config.aimbotAtivo = m end, "AIM")
+criarCheckbox(abaAIM, T("silentAim"), 0.5, 10, 0.5, function(m) Config.silentAimAtivo = m end, "SILENT")
+criarCheckbox(abaAIM, T("aimVisible"), 0, 45, 0.5, function(m) Config.aimVisible = m end, "VISIVEL")
+criarCheckbox(abaAIM, T("aimTiro"), 0.5, 45, 0.5, function(m) Config.aimTiro = m end, "TIRO")
+criarCheckbox(abaAIM, T("aimMira"), 0, 80, 0.5, function(m) Config.aimMira = m end, "MIRA")
+criarCheckbox(abaAIM, T("mostrarFov"), 0.5, 80, 0.5, function(m) Config.mostrarFov = m end, "FOV")
+criarCheckbox(abaAIM, T("autoShoot"), 0, 115, 1, function(m) Config.autoShoot = m end, "SHOOT")
 
-criarSlider(abaAIM, "FOV", 0, 120, 1, 90, 0, 180, function(v) Config.aimFov = v end)
+criarSlider(abaAIM, "FOV", 0, 150, 1, 90, 0, 180, function(v) Config.aimFov = v end)
 
-criarDropdown(abaAIM, T("parteAimbot"), 0, 175, 0.5, {"Head", "Torso", "Random"}, function(v) Config.parteAimbot = v end)
-criarDropdown(abaAIM, T("parteSilent"), 0.5, 175, 0.5, {"Head", "Torso", "Random"}, function(v) Config.parteSilent = v end)
+criarDropdown(abaAIM, T("parteAimbot"), 0, 205, 0.5, {"Head", "Torso", "Random"}, function(v) Config.parteAimbot = v end)
+criarDropdown(abaAIM, T("parteSilent"), 0.5, 205, 0.5, {"Head", "Torso", "Random"}, function(v) Config.parteSilent = v end)
 
--- ============ ABA ESP ============
 local abaESP = conteudosAba["ESP"]
 
-criarCheckbox(abaESP, "ESP", 0, 10, 0.5, function(m) Config.espAtivo = m end)
-criarCheckbox(abaESP, T("espVida"), 0.5, 10, 0.5, function(m) Config.espVida = m end)
-criarCheckbox(abaESP, T("espLinha"), 0, 45, 0.5, function(m) Config.espLinha = m end)
-criarCheckbox(abaESP, T("espCaixa"), 0.5, 45, 0.5, function(m) Config.espCaixa = m end)
-criarCheckbox(abaESP, T("espNome"), 0, 80, 0.5, function(m) Config.espNome = m end)
-criarCheckbox(abaESP, T("espDistancia"), 0.5, 80, 0.5, function(m) Config.espDistancia = m end)
-criarCheckbox(abaESP, T("espRainbow"), 0, 115, 0.5, function(m) Config.espRainbow = m end)
+criarCheckbox(abaESP, "ESP", 0, 10, 0.5, function(m) Config.espAtivo = m end, "ESP")
+criarCheckbox(abaESP, T("espVida"), 0.5, 10, 0.5, function(m) Config.espVida = m end, "VIDA")
+criarCheckbox(abaESP, T("espLinha"), 0, 45, 0.5, function(m) Config.espLinha = m end, "LINHA")
+criarCheckbox(abaESP, T("espCaixa"), 0.5, 45, 0.5, function(m) Config.espCaixa = m end, "CAIXA")
+criarCheckbox(abaESP, T("espNome"), 0, 80, 0.5, function(m) Config.espNome = m end, "NOME")
+criarCheckbox(abaESP, T("espDistancia"), 0.5, 80, 0.5, function(m) Config.espDistancia = m end, "DIST")
+criarCheckbox(abaESP, T("espRainbow"), 0, 115, 0.5, function(m) Config.espRainbow = m end, "RBE")
 
 criarDropdown(abaESP, T("posicaoLinha"), 0.5, 115, 0.5, {T("topoTela"), T("meioTela"), T("baixoTela")}, function(v)
     if v == T("topoTela") then Config.posicaoLinha = "Topo"
@@ -582,30 +675,48 @@ criarDropdown(abaESP, T("corEsp"), 0, 160, 0.5, {"Vermelho", "Verde", "Azul", "A
     elseif v == "Branco" then Config.corEsp = Color3.fromRGB(255, 255, 255) end
 end)
 
--- ============ ABA HACKS (EXPLOITS) ============
 local abaHACKS = conteudosAba["HACKS"]
 
-criarCheckbox(abaHACKS, T("spinbot"), 0, 10, 0.5, function(m) Config.spinbot = m end)
+criarCheckbox(abaHACKS, T("spinbot"), 0, 10, 0.5, function(m) Config.spinbot = m end, "SPIN")
 criarCheckbox(abaHACKS, T("speed"), 0.5, 10, 0.5, function(m) 
     Config.speed = m
     local char = LocalPlayer.Character
     if char and char:FindFirstChild("Humanoid") then
         char.Humanoid.WalkSpeed = m and 100 or 16
     end
-end)
-criarCheckbox(abaHACKS, T("fly"), 0, 45, 0.5, function(m) Config.fly = m end)
-criarCheckbox(abaHACKS, T("aimkill"), 0.5, 45, 0.5, function(m) Config.aimkill = m end)
-criarCheckbox(abaHACKS, T("ghost"), 0, 80, 0.5, function(m) Config.ghost = m end)
-criarCheckbox(abaHACKS, T("teleport"), 0.5, 80, 0.5, function(m) 
+end, "SPEED")
+criarCheckbox(abaHACKS, T("fly"), 0, 45, 0.5, function(m) Config.fly = m end, "FLY")
+criarCheckbox(abaHACKS, T("ghost"), 0.5, 45, 0.5, function(m) Config.ghost = m end, "GHOST")
+criarCheckbox(abaHACKS, T("teleport"), 0, 80, 0.5, function(m) 
     if m then
         local char = LocalPlayer.Character
         if char and char:FindFirstChild("HumanoidRootPart") then
             char.HumanoidRootPart.CFrame = Mouse.Hit
         end
     end
-end)
+end, "TP")
+criarCheckbox(abaHACKS, T("fullbright"), 0.5, 80, 0.5, function(m) 
+    Config.fullbright = m
+    if m then
+        Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+        Lighting.Brightness = 2
+    else
+        Lighting.Ambient = Color3.fromRGB(70, 70, 70)
+        Lighting.Brightness = 1
+    end
+end, "FULL")
+criarCheckbox(abaHACKS, T("nofog"), 0, 115, 0.5, function(m) 
+    Config.nofog = m
+    if m then
+        Lighting.FogEnd = 100000
+    else
+        Lighting.FogEnd = 1000
+    end
+end, "NOFOG")
+criarCheckbox(abaHACKS, T("infinitejump"), 0.5, 115, 0.5, function(m) Config.infinitejump = m end, "INFJ")
+criarCheckbox(abaHACKS, T("antiafk"), 0, 150, 0.5, function(m) Config.antiafk = m end, "AFK")
+criarCheckbox(abaHACKS, T("waterwalk"), 0.5, 150, 0.5, function(m) Config.waterwalk = m end, "AGUA")
 
--- ============ ABA CFG ============
 local abaCFG = conteudosAba["CFG"]
 
 criarDropdown(abaCFG, T("lingua"), 0, 10, 1, {"PT", "EN", "ES"}, function(v)
@@ -622,23 +733,12 @@ criarDropdown(abaCFG, T("corPainel"), 0, 75, 1, {"Roxo", "Verde", "Azul", "Verme
     elseif v == "Laranja" then Config.corPainel = Color3.fromRGB(230, 120, 0)
     elseif v == "Rosa" then Config.corPainel = Color3.fromRGB(220, 50, 150)
     elseif v == "Ciano" then Config.corPainel = Color3.fromRGB(0, 200, 200) end
-
     header.BackgroundColor3 = Config.corPainel
     bordaPainel.Color = Config.corPainel
 end)
 
-local rainbowBtn = criarCheckbox(abaCFG, T("rainbow") .. ": " .. T("rainbowOff"), 0, 140, 1, function(m)
-    Config.rainbow = m
-    if m then
-        rainbowBtn.setTexto(T("rainbow") .. ": " .. T("rainbowOn"))
-    else
-        rainbowBtn.setTexto(T("rainbow") .. ": " .. T("rainbowOff"))
-        header.BackgroundColor3 = Config.corPainel
-        bordaPainel.Color = Config.corPainel
-    end
-end)
+criarCheckbox(abaCFG, T("rainbow"), 0, 140, 1, function(m) Config.rainbow = m end)
 
--- ============ ABA INFO ============
 local abaINFO = conteudosAba["INFO"]
 
 local infoLabel = Instance.new("TextLabel")
@@ -653,7 +753,6 @@ infoLabel.TextXAlignment = Enum.TextXAlignment.Left
 infoLabel.TextYAlignment = Enum.TextYAlignment.Top
 infoLabel.Parent = abaINFO
 
--- ============ TROCAR ABA ============
 local function trocarAba(nomeAba)
     for nome, conteudo in pairs(conteudosAba) do
         conteudo.Visible = (nome == nomeAba)
@@ -675,7 +774,6 @@ end
 
 trocarAba("AIM")
 
--- ============ MINIMIZAR ============
 botaoMinimizar.MouseButton1Click:Connect(function()
     if menuLateral.Visible then
         menuLateral.Visible = false
@@ -685,7 +783,7 @@ botaoMinimizar.MouseButton1Click:Connect(function()
     else
         menuLateral.Visible = true
         areaConteudo.Visible = true
-        painel.Size = UDim2.new(0, 520, 0, 340)
+        painel.Size = UDim2.new(0, 520, 0, 380)
         botaoMinimizar.Text = "▼"
     end
 end)
@@ -694,7 +792,6 @@ botaoFechar.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- ============ RAINBOW DO PAINEL ============
 local hue = 0
 RunService.Heartbeat:Connect(function(dt)
     if Config.rainbow then
@@ -702,13 +799,12 @@ RunService.Heartbeat:Connect(function(dt)
         local cor = Color3.fromHSV(hue, 1, 1)
         header.BackgroundColor3 = cor
         bordaPainel.Color = cor
-    elseif Config.corPainel then
+    else
         header.BackgroundColor3 = Config.corPainel
         bordaPainel.Color = Config.corPainel
     end
 end)
 
--- ============ CÍRCULO DO FOV ============
 local fovCircle = Instance.new("Frame")
 fovCircle.Name = "FOVCircle"
 fovCircle.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -728,7 +824,6 @@ fovStroke.Thickness = 2
 fovStroke.Transparency = 0.3
 fovStroke.Parent = fovCircle
 
--- ============ ESP ============
 local espCache = {}
 
 local function criarESP(jogador)
@@ -801,7 +896,6 @@ local function removerESP(jogador)
     end
 end
 
--- ============ LINHAS DO ESP (ALINHADAS) ============
 local linhasCache = {}
 
 local function atualizarLinhas()
@@ -814,7 +908,6 @@ local function atualizarLinhas()
 
     local camera = workspace.CurrentCamera
     local viewport = camera.ViewportSize
-
     local yPos = viewport.Y / 2
     if Config.posicaoLinha == "Topo" then yPos = 0
     elseif Config.posicaoLinha == "Baixo" then yPos = viewport.Y end
@@ -826,7 +919,7 @@ local function atualizarLinhas()
                 local screenPos, onScreen = camera:WorldToViewportPoint(head.Position)
                 if onScreen then
                     local linha = Instance.new("Frame")
-                    linha.Size = UDim2.new(0, 2, 0, math.abs(yPos - screenPos.Y))
+                    linha.Size = UDim2.new(0, 1, 0, math.abs(yPos - screenPos.Y))
                     linha.Position = UDim2.new(0, screenPos.X, 0, math.min(yPos, screenPos.Y))
                     linha.BackgroundColor3 = Config.corEsp
                     linha.BorderSizePixel = 0
@@ -839,13 +932,16 @@ local function atualizarLinhas()
     end
 end
 
--- ============ AIMBOT COM RAYCAST ============
-local function temParede(posOrigem, posAlvo)
+local function temParede(posOrigem, posAlvo, personagemAlvo)
     local params = RaycastParams.new()
-    params.FilterDescendantsInstances = {LocalPlayer.Character, Camera}
+    local ignorar = {LocalPlayer.Character, Camera}
+    if personagemAlvo then
+        table.insert(ignorar, personagemAlvo)
+    end
+    params.FilterDescendantsInstances = ignorar
     params.FilterType = Enum.RaycastFilterType.Exclude
-
-    local resultado = workspace:Raycast(posOrigem, posAlvo - posOrigem, params)
+    local direcao = posAlvo - posOrigem
+    local resultado = workspace:Raycast(posOrigem, direcao, params)
     if resultado then
         return true
     end
@@ -856,11 +952,9 @@ local function pegarAlvo(parte)
     local char = LocalPlayer.Character
     if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
 
-    local minhaPos = char.HumanoidRootPart.Position
     local camera = workspace.CurrentCamera
     local centroTela = Vector2.new(camera.ViewportSize.X / 2, camera.ViewportSize.Y / 2)
     local maxDist = Config.aimFov
-
     local melhor = nil
     local menorDist = math.huge
 
@@ -884,7 +978,7 @@ local function pegarAlvo(parte)
                     local distTela = (Vector2.new(screenPos.X, screenPos.Y) - centroTela).Magnitude
                     if distTela < menorDist and distTela < maxDist * 5 then
                         if Config.aimVisible then
-                            if not temParede(camera.CFrame.Position, parteAlvo.Position) then
+                            if not temParede(camera.CFrame.Position, parteAlvo.Position, jogador.Character) then
                                 menorDist = distTela
                                 melhor = parteAlvo
                             end
@@ -897,38 +991,69 @@ local function pegarAlvo(parte)
             end
         end
     end
-
     return melhor
 end
 
--- ============ SILENT AIM (TENTATIVA DE HOOK) ============
-local function tentarHookSilentAim()
-    local sucesso = pcall(function()
-        if hookmetamethod and getrawmetatable and setreadonly and newcclosure then
-            local mt = getrawmetatable(game)
-            local oldNamecall = mt.__namecall
-            setreadonly(mt, false)
-            mt.__namecall = newcclosure(function(self, ...)
-                local method = getnamecallmethod()
-                if Config.silentAimAtivo and (method == "Fire" or method == "Raycast") then
-                    -- Hook real seria aqui, mas depende do executor
-                end
-                return oldNamecall(self, ...)
-            end)
-            setreadonly(mt, true)
-            return true
-        end
+local function ativarSilentAim()
+    if not hookmetamethod or not getrawmetatable or not setreadonly or not newcclosure then
+        print("[FFH4X] Silent Aim: hooks nao suportados.")
         return false
+    end
+    local sucesso = pcall(function()
+        local mt = getrawmetatable(game)
+        local oldNamecall = mt.__namecall
+        setreadonly(mt, false)
+        mt.__namecall = newcclosure(function(self, ...)
+            local method = getnamecallmethod()
+            local args = {...}
+            if Config.silentAimAtivo and (method == "FireServer" or method == "InvokeServer") then
+                if self and (self:IsA("Tool") or self:IsA("RemoteEvent") or self:IsA("RemoteFunction")) then
+                    local alvo = pegarAlvo(Config.parteSilent)
+                    if alvo then
+                        for i, arg in ipairs(args) do
+                            if typeof(arg) == "Vector3" then
+                                args[i] = alvo.Position
+                            end
+                        end
+                        return oldNamecall(self, unpack(args))
+                    end
+                end
+            end
+            return oldNamecall(self, ...)
+        end)
+        setreadonly(mt, true)
+        return true
     end)
     return sucesso
 end
 
-local hookOk = tentarHookSilentAim()
-if not hookOk then
-    print("[FFH4X] Silent Aim: hooks nao suportados neste executor. Apenas Aimbot visual ativo.")
+local hookAtivo = ativarSilentAim()
+if hookAtivo then
+    print("[FFH4X] Silent Aim ativado")
 end
 
--- ============ LOOP AIMBOT ============
+local function autoShoot()
+    local char = LocalPlayer.Character
+    if not char then return end
+    local ferramenta = char:FindFirstChildOfClass("Tool")
+    if not ferramenta then return end
+    for _, obj in ipairs(ferramenta:GetDescendants()) do
+        if obj:IsA("RemoteEvent") or obj:IsA("RemoteFunction") then
+            local nome = obj.Name:lower()
+            if nome:find("fire") or nome:find("shoot") or nome:find("attack") or nome:find("hit") then
+                local alvo = pegarAlvo(Config.parteAimbot)
+                if alvo then
+                    pcall(function()
+                        if obj:IsA("RemoteEvent") then
+                            obj:FireServer(alvo.Position)
+                        end
+                    end)
+                end
+            end
+        end
+    end
+end
+
 RunService.RenderStepped:Connect(function()
     if Config.mostrarFov then
         fovCircle.Visible = true
@@ -936,7 +1061,6 @@ RunService.RenderStepped:Connect(function()
     else
         fovCircle.Visible = false
     end
-
     if Config.aimbotAtivo then
         local alvo = pegarAlvo(Config.parteAimbot)
         if alvo then
@@ -946,21 +1070,27 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- ============ LOOP ESP ============
+task.spawn(function()
+    while gui.Parent do
+        if Config.autoShoot then
+            pcall(autoShoot)
+        end
+        task.wait(0.1)
+    end
+end)
+
 RunService.RenderStepped:Connect(function()
     local corAtual = Config.corEsp
     if Config.espRainbow then
         local h = (tick() * 0.5) % 1
         corAtual = Color3.fromHSV(h, 1, 1)
     end
-
     if Config.espAtivo then
         for _, jogador in ipairs(Players:GetPlayers()) do
             if jogador ~= LocalPlayer and jogador.Character and jogador.Character:FindFirstChild("HumanoidRootPart") then
                 if not espCache[jogador] then
                     criarESP(jogador)
                 end
-
                 local cache = espCache[jogador]
                 if cache then
                     cache.highlight.Adornee = jogador.Character
@@ -971,13 +1101,11 @@ RunService.RenderStepped:Connect(function()
                     cache.nome.TextColor3 = corAtual
                     cache.distancia.Visible = Config.espDistancia
                     cache.vida.Visible = Config.espVida
-
                     local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
                     if hrp then
                         local dist = (jogador.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
                         cache.distancia.Text = math.floor(dist) .. " studs"
                     end
-
                     local hum = jogador.Character:FindFirstChild("Humanoid")
                     if hum then
                         cache.vida.Text = math.floor(hum.Health) .. " HP"
@@ -997,7 +1125,6 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- ============ HACKS: SPINBOT ============
 RunService.Heartbeat:Connect(function()
     if Config.spinbot then
         local char = LocalPlayer.Character
@@ -1007,16 +1134,12 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
--- ============ HACKS: FLY MOBILE ============
-local flyVelocidade = 1
-
 RunService.RenderStepped:Connect(function()
     if Config.fly then
         local char = LocalPlayer.Character
         if char and char:FindFirstChild("HumanoidRootPart") then
             local hrp = char.HumanoidRootPart
             local camera = workspace.CurrentCamera
-
             local direcao = Vector3.new(0, 0, 0)
             if UserInputService:IsKeyDown(Enum.KeyCode.W) then direcao = direcao + camera.CFrame.LookVector end
             if UserInputService:IsKeyDown(Enum.KeyCode.S) then direcao = direcao - camera.CFrame.LookVector end
@@ -1024,59 +1147,47 @@ RunService.RenderStepped:Connect(function()
             if UserInputService:IsKeyDown(Enum.KeyCode.D) then direcao = direcao + camera.CFrame.RightVector end
             if UserInputService:IsKeyDown(Enum.KeyCode.Space) then direcao = direcao + Vector3.new(0, 1, 0) end
             if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then direcao = direcao - Vector3.new(0, 1, 0) end
-
             if direcao.Magnitude > 0 then
-                direcao = direcao.Unit * 50 * flyVelocidade
+                direcao = direcao.Unit * 50
             end
-
             hrp.Velocity = direcao
         end
     end
 end)
 
--- ============ HACKS: AIMKILL ============
-RunService.Heartbeat:Connect(function()
-    if Config.aimkill then
+UserInputService.JumpRequest:Connect(function()
+    if Config.infinitejump then
         local char = LocalPlayer.Character
-        if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-
-        local minhaPos = char.HumanoidRootPart.Position
-
-        for _, jogador in ipairs(Players:GetPlayers()) do
-            if jogador ~= LocalPlayer and jogador.Character then
-                local hum = jogador.Character:FindFirstChild("Humanoid")
-                local hrp = jogador.Character:FindFirstChild("HumanoidRootPart")
-
-                if hum and hrp then
-                    local dist = (hrp.Position - minhaPos).Magnitude
-                    if dist < 20 then
-                        hum.Health = 0
-                    end
-                end
-            end
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
         end
     end
 end)
 
--- ============ HACKS: GHOST ============
-local ghostPosicao = nil
+LocalPlayer.Idled:Connect(function()
+    if Config.antiafk then
+        local vu = game:GetService("VirtualUser")
+        vu:CaptureController()
+        vu:ClickButton2(Vector2.new())
+    end
+end)
 
 RunService.Heartbeat:Connect(function()
-    if Config.ghost then
+    if Config.waterwalk then
         local char = LocalPlayer.Character
         if char and char:FindFirstChild("HumanoidRootPart") then
-            if not ghostPosicao then
-                ghostPosicao = char.HumanoidRootPart.CFrame
+            local hrp = char.HumanoidRootPart
+            local ray = Ray.new(hrp.Position, Vector3.new(0, -10, 0))
+            local hit, pos = workspace:FindPartOnRay(ray, char)
+            if hit and hit.Material == Enum.Material.Water then
+                hrp.CFrame = CFrame.new(pos + Vector3.new(0, 3, 0))
             end
         end
-    else
-        ghostPosicao = nil
     end
 end)
 
--- ============ PLAYER REMOVING ============
 Players.PlayerRemoving:Connect(function(jogador)
     removerESP(jogador)
 end)
 
-print("[FFH4X] v3.0 carregado! Feito por Ewerton")
+print("[FFH4X] v6.0 carregado! Feito por Ewerton")
