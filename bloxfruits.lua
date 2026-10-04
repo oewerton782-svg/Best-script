@@ -628,7 +628,7 @@ local function notificar(titulo, texto, tipo)
         end
         TweenService:Create(notif, TweenInfo.new(0.3), {
             Position = UDim2.new(1, 20, 0, notif.Position.Y.Scale)
-        }):Play()        }):Play()
+        }):Play()
         task.wait(0.35)
         notif:Destroy()
     end)
