@@ -1,7 +1,7 @@
 --[[
     BF4X Premium - Blox Fruits Script
     Feito por Ewerton
-    Versao: 1.0 Premium
+    Versao: 1.1 Premium
     Compatibilidade: Arceus X
 ]]
 
@@ -12,17 +12,94 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local Camera = workspace.CurrentCamera
+local MarketplaceService = game:GetService("MarketplaceService")
 
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
-local PlaceIds = {
-    [2753915549] = 1,
-    [4442272183] = 2,
-    [7449423635] = 3
-}
+-- ============ DETECCAO DE MAR INTELIGENTE ============
+local function detectarMar()
+    local nomeJogo = ""
+    local sucesso, info = pcall(function()
+        return MarketplaceService:GetProductInfo(game.PlaceId)
+    end)
 
-local MAR = PlaceIds[game.PlaceId]
+    if sucesso and info then
+        nomeJogo = info.Name or ""
+    end
+
+    print("[BF4X] Nome do jogo: " .. nomeJogo)
+
+    local eBloxFruits = nomeJogo:lower():find("blox") and nomeJogo:lower():find("fruit")
+
+    if not eBloxFruits then
+        local idsBloxFruits = {
+            2753915549, 4442272183, 7449423635,
+            920587237, 7909173265657, 7909174109773
+        }
+        for _, id in ipairs(idsBloxFruits) do
+            if game.PlaceId == id then
+                eBloxFruits = true
+                break
+            end
+        end
+    end
+
+    if not eBloxFruits then
+        return nil
+    end
+
+    local mapa = workspace:FindFirstChild("Map") or workspace
+
+    local ilhasMar = {
+        [1] = {"Jungle", "Pirate Village", "Magma Village", "Marine Ford", "Fountain City", "Colosseum", "Prison"},
+        [2] = {"Kingdom of Rose", "Green Zone", "Cursed Ship", "Ice Castle", "Forgotten Island", "Graveyard", "Snow Mountain"},
+        [3] = {"Port Town", "Hydra Island", "Castle on the Sea", "Haunted Castle", "Floating Turtle", "Sea of Treats", "Tiki Outpost"}
+    }
+
+    local contagem = {[1] = 0, [2] = 0, [3] = 0}
+
+    if mapa then
+        for mar, listaIlhas in pairs(ilhasMar) do
+            for _, nomeIlha in ipairs(listaIlhas) do
+                for _, filho in ipairs(mapa:GetDescendants()) do
+                    if filho.Name:lower():find(nomeIlha:lower()) then
+                        contagem[mar] = contagem[mar] + 1
+                        break
+                    end
+                end
+            end
+        end
+    end
+
+    print("[BF4X] Ilhas - Sea 1: " .. contagem[1] .. " | Sea 2: " .. contagem[2] .. " | Sea 3: " .. contagem[3])
+
+    local marDetectado = 0
+    local maiorContagem = 0
+
+    for mar, qtd in pairs(contagem) do
+        if qtd > maiorContagem then
+            maiorContagem = qtd
+            marDetectado = mar
+        end
+    end
+
+    if maiorContagem >= 1 then
+        return marDetectado
+    end
+
+    local PlaceIds = {
+        [2753915549] = 1,
+        [4442272183] = 2,
+        [7449423635] = 3,
+        [920587237] = 2,
+        [7909173265657] = 2
+    }
+
+    return PlaceIds[game.PlaceId]
+end
+
+local MAR = detectarMar()
 
 if not MAR then
     print("[BF4X] Voce nao esta no Blox Fruits!")
@@ -35,18 +112,16 @@ if CoreGui:FindFirstChild("BF4X") then
     CoreGui.BF4X:Destroy()
 end
 
+-- ============ TEXTOS ============
 local Textos = {
     pt = {
         farm = "FARM", tp = "TP", esp = "ESP", move = "MOVE", visual = "VISUAL", cfg = "CFG", info = "INFO",
-        autoFarm = "Auto Farm",
         autoFarmLevel = "Auto Farm Level",
         autoFarmBoss = "Auto Farm Boss",
         autoFarmFruit = "Auto Farm Fruta",
         fastAttack = "Fast Attack",
         autoChest = "Auto Chest",
         autoHaki = "Auto Haki",
-        autoSword = "Auto Sword",
-        autoGun = "Auto Gun",
         tpIslands = "Ilhas",
         tpBosses = "Bosses",
         tpSpecials = "Especiais",
@@ -55,7 +130,6 @@ local Textos = {
         espFruits = "ESP Frutas",
         espChests = "ESP Chests",
         espEnemies = "ESP Enemies",
-        espFlowers = "ESP Flores",
         speed = "Speed",
         fly = "Fly",
         noclip = "Noclip",
@@ -64,31 +138,21 @@ local Textos = {
         fullbright = "Fullbright",
         noFog = "No Fog",
         fpsBoost = "FPS Boost",
-        timeOfDay = "Time of Day",
         language = "Lingua",
         panelColor = "Cor do Painel",
         rainbow = "Modo Rainbow",
         notifications = "Notificacoes",
         watermark = "Watermark",
-        panelSize = "Tamanho do Painel",
-        resetSize = "Resetar Tamanho",
-        creditos = "Feito por Ewerton\nVersao Premium 1.0\n\nUse com responsabilidade.",
-        players = "Jogadores",
-        online = "Online",
-        noPlayers = "Nenhum jogador",
-        confirmTp = "Teleportar para"
+        creditos = "Feito por Ewerton\nVersao Premium 1.1\n\nUse com responsabilidade."
     },
     en = {
         farm = "FARM", tp = "TP", esp = "ESP", move = "MOVE", visual = "VISUAL", cfg = "CFG", info = "INFO",
-        autoFarm = "Auto Farm",
         autoFarmLevel = "Auto Farm Level",
         autoFarmBoss = "Auto Farm Boss",
         autoFarmFruit = "Auto Farm Fruit",
         fastAttack = "Fast Attack",
         autoChest = "Auto Chest",
         autoHaki = "Auto Haki",
-        autoSword = "Auto Sword",
-        autoGun = "Auto Gun",
         tpIslands = "Islands",
         tpBosses = "Bosses",
         tpSpecials = "Specials",
@@ -97,7 +161,6 @@ local Textos = {
         espFruits = "ESP Fruits",
         espChests = "ESP Chests",
         espEnemies = "ESP Enemies",
-        espFlowers = "ESP Flowers",
         speed = "Speed",
         fly = "Fly",
         noclip = "Noclip",
@@ -106,31 +169,21 @@ local Textos = {
         fullbright = "Fullbright",
         noFog = "No Fog",
         fpsBoost = "FPS Boost",
-        timeOfDay = "Time of Day",
         language = "Language",
         panelColor = "Panel Color",
         rainbow = "Rainbow Mode",
         notifications = "Notifications",
         watermark = "Watermark",
-        panelSize = "Panel Size",
-        resetSize = "Reset Size",
-        creditos = "Made by Ewerton\nPremium Version 1.0\n\nUse responsibly.",
-        players = "Players",
-        online = "Online",
-        noPlayers = "No players",
-        confirmTp = "Teleport to"
+        creditos = "Made by Ewerton\nPremium Version 1.1\n\nUse responsibly."
     },
     es = {
         farm = "FARM", tp = "TP", esp = "ESP", move = "MOVE", visual = "VISUAL", cfg = "CFG", info = "INFO",
-        autoFarm = "Auto Farm",
         autoFarmLevel = "Auto Farm Nivel",
         autoFarmBoss = "Auto Farm Jefe",
         autoFarmFruit = "Auto Farm Fruta",
         fastAttack = "Ataque Rapido",
         autoChest = "Auto Cofre",
         autoHaki = "Auto Haki",
-        autoSword = "Auto Espada",
-        autoGun = "Auto Pistola",
         tpIslands = "Islas",
         tpBosses = "Jefes",
         tpSpecials = "Especiales",
@@ -139,7 +192,6 @@ local Textos = {
         espFruits = "ESP Frutas",
         espChests = "ESP Cofres",
         espEnemies = "ESP Enemigos",
-        espFlowers = "ESP Flores",
         speed = "Velocidad",
         fly = "Volar",
         noclip = "Noclip",
@@ -148,19 +200,12 @@ local Textos = {
         fullbright = "Brillo Total",
         noFog = "Sin Niebla",
         fpsBoost = "Boost FPS",
-        timeOfDay = "Hora del Dia",
         language = "Idioma",
         panelColor = "Color del Panel",
         rainbow = "Modo Arcoiris",
         notifications = "Notificaciones",
         watermark = "Marca de Agua",
-        panelSize = "Tamano del Panel",
-        resetSize = "Reiniciar Tamano",
-        creditos = "Hecho por Ewerton\nVersion Premium 1.0\n\nUsar con responsabilidad.",
-        players = "Jugadores",
-        online = "En linea",
-        noPlayers = "Sin jugadores",
-        confirmTp = "Teletransportar a"
+        creditos = "Hecho por Ewerton\nVersion Premium 1.1\n\nUsar con responsabilidad."
     }
 }
 
@@ -170,11 +215,10 @@ local function T(chave)
     return Textos[idiomaAtual][chave] or chave
 end
 
+-- ============ CONFIG ============
 local Config = {
     mar = MAR,
     panelSize = 1.0,
-    corPainel = Color3.fromRGB(0, 163, 255),
-    corDourada = Color3.fromRGB(255, 215, 0),
     rainbow = false,
     notificacoes = true,
     watermark = true,
@@ -199,29 +243,28 @@ local Config = {
 
     fullbright = false,
     noFog = false,
-    fpsBoost = false,
-    timeOfDay = false,
-
-    rainbowAtivo = false
+    fpsBoost = false
 }
 
 local Cores = {
-    fundo = Color3.fromRGB(10, 10, 15),
-    fundoPainel = Color3.fromRGB(20, 20, 31),
-    fundoSecundario = Color3.fromRGB(30, 30, 45),
-    fundoAba = Color3.fromRGB(25, 25, 38),
+    fundo = Color3.fromRGB(8, 8, 14),
+    fundoPainel = Color3.fromRGB(18, 18, 28),
+    fundoAba = Color3.fromRGB(26, 26, 40),
+    fundoSecundario = Color3.fromRGB(32, 32, 48),
     azul = Color3.fromRGB(0, 163, 255),
     azulClaro = Color3.fromRGB(80, 200, 255),
     azulEscuro = Color3.fromRGB(0, 100, 180),
+    roxo = Color3.fromRGB(120, 0, 200),
     dourado = Color3.fromRGB(255, 215, 0),
     douradoClaro = Color3.fromRGB(255, 235, 130),
     texto = Color3.fromRGB(255, 255, 255),
     cinza = Color3.fromRGB(160, 160, 180),
-    cinzaEscuro = Color3.fromRGB(100, 100, 120),
+    cinzaEscuro = Color3.fromRGB(80, 80, 100),
     verde = Color3.fromRGB(0, 220, 100),
     vermelho = Color3.fromRGB(220, 50, 50)
 }
 
+-- ============ GUI PRINCIPAL ============
 local gui = Instance.new("ScreenGui")
 gui.Name = "BF4X"
 gui.ResetOnSpawn = false
@@ -239,12 +282,8 @@ painel.Active = true
 painel.Draggable = true
 painel.Parent = gui
 
-local uiScale = Instance.new("UIScale")
-uiScale.Scale = Config.panelSize
-uiScale.Parent = painel
-
 local cantoPainel = Instance.new("UICorner")
-cantoPainel.CornerRadius = UDim.new(0, 12)
+cantoPainel.CornerRadius = UDim.new(0, 14)
 cantoPainel.Parent = painel
 
 local bordaPainel = Instance.new("UIStroke")
@@ -255,41 +294,43 @@ bordaPainel.Parent = painel
 
 local gradientPainel = Instance.new("UIGradient")
 gradientPainel.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 35)),
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(25, 15, 40)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(18, 18, 28)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 20))
 }
-gradientPainel.Rotation = 45
+gradientPainel.Rotation = 135
 gradientPainel.Parent = painel
 
+-- ============ HEADER ============
 local header = Instance.new("Frame")
 header.Name = "Header"
-header.Size = UDim2.new(1, 0, 0, 42)
+header.Size = UDim2.new(1, 0, 0, 44)
 header.BackgroundColor3 = Cores.azul
 header.BorderSizePixel = 0
 header.Parent = painel
 
 local cantoHeader = Instance.new("UICorner")
-cantoHeader.CornerRadius = UDim.new(0, 12)
+cantoHeader.CornerRadius = UDim.new(0, 14)
 cantoHeader.Parent = header
 
 local gradientHeader = Instance.new("UIGradient")
 gradientHeader.Color = ColorSequence.new{
     ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 163, 255)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(0, 130, 220)),
+    ColorSequenceKeypoint.new(0.3, Color3.fromRGB(120, 0, 200)),
     ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 215, 0))
 }
 gradientHeader.Rotation = 0
 gradientHeader.Parent = header
 
 local botaoMinimizar = Instance.new("TextButton")
-botaoMinimizar.Size = UDim2.new(0, 30, 0, 30)
+botaoMinimizar.Size = UDim2.new(0, 32, 0, 32)
 botaoMinimizar.Position = UDim2.new(0, 8, 0, 6)
 botaoMinimizar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 botaoMinimizar.BackgroundTransparency = 0.85
 botaoMinimizar.BorderSizePixel = 0
 botaoMinimizar.Text = "−"
 botaoMinimizar.TextColor3 = Cores.texto
-botaoMinimizar.TextSize = 18
+botaoMinimizar.TextSize = 20
 botaoMinimizar.Font = Enum.Font.GothamBold
 botaoMinimizar.Parent = header
 
@@ -298,47 +339,47 @@ cantoMin.CornerRadius = UDim.new(1, 0)
 cantoMin.Parent = botaoMinimizar
 
 local tituloHeader = Instance.new("TextLabel")
-tituloHeader.Size = UDim2.new(0.4, 0, 1, 0)
-tituloHeader.Position = UDim2.new(0.1, 0, 0, 0)
+tituloHeader.Size = UDim2.new(0.35, 0, 1, 0)
+tituloHeader.Position = UDim2.new(0.08, 0, 0, 0)
 tituloHeader.BackgroundTransparency = 1
 tituloHeader.Text = "BF4X"
 tituloHeader.TextColor3 = Cores.texto
-tituloHeader.TextSize = 20
+tituloHeader.TextSize = 22
 tituloHeader.Font = Enum.Font.GothamBlack
 tituloHeader.TextXAlignment = Enum.TextXAlignment.Left
 tituloHeader.Parent = header
 
 local versaoHeader = Instance.new("TextLabel")
-versaoHeader.Size = UDim2.new(0.2, 0, 1, 0)
+versaoHeader.Size = UDim2.new(0.25, 0, 1, 0)
 versaoHeader.Position = UDim2.new(0.42, 0, 0, 0)
 versaoHeader.BackgroundTransparency = 1
 versaoHeader.Text = "PREMIUM"
 versaoHeader.TextColor3 = Cores.dourado
-versaoHeader.TextSize = 11
+versaoHeader.TextSize = 12
 versaoHeader.Font = Enum.Font.GothamBold
 versaoHeader.TextXAlignment = Enum.TextXAlignment.Left
 versaoHeader.Parent = header
 
 local marHeader = Instance.new("TextLabel")
-marHeader.Size = UDim2.new(0.25, 0, 1, 0)
-marHeader.Position = UDim2.new(0.6, 0, 0, 0)
+marHeader.Size = UDim2.new(0.22, 0, 1, 0)
+marHeader.Position = UDim2.new(0.65, 0, 0, 0)
 marHeader.BackgroundTransparency = 1
 marHeader.Text = "Sea " .. MAR
 marHeader.TextColor3 = Cores.texto
-marHeader.TextSize = 14
+marHeader.TextSize = 15
 marHeader.Font = Enum.Font.GothamBold
 marHeader.TextXAlignment = Enum.TextXAlignment.Right
 marHeader.Parent = header
 
 local botaoFechar = Instance.new("TextButton")
-botaoFechar.Size = UDim2.new(0, 30, 0, 30)
-botaoFechar.Position = UDim2.new(1, -38, 0, 6)
+botaoFechar.Size = UDim2.new(0, 32, 0, 32)
+botaoFechar.Position = UDim2.new(1, -40, 0, 6)
 botaoFechar.BackgroundColor3 = Color3.fromRGB(255, 60, 60)
 botaoFechar.BackgroundTransparency = 0.2
 botaoFechar.BorderSizePixel = 0
 botaoFechar.Text = "X"
 botaoFechar.TextColor3 = Cores.texto
-botaoFechar.TextSize = 14
+botaoFechar.TextSize = 15
 botaoFechar.Font = Enum.Font.GothamBold
 botaoFechar.Parent = header
 
@@ -346,10 +387,11 @@ local cantoFechar = Instance.new("UICorner")
 cantoFechar.CornerRadius = UDim.new(1, 0)
 cantoFechar.Parent = botaoFechar
 
+-- ============ SIDEBAR ============
 local sidebar = Instance.new("Frame")
 sidebar.Name = "Sidebar"
-sidebar.Size = UDim2.new(0, 130, 1, -42)
-sidebar.Position = UDim2.new(0, 0, 0, 42)
+sidebar.Size = UDim2.new(0, 140, 1, -44)
+sidebar.Position = UDim2.new(0, 0, 0, 44)
 sidebar.BackgroundColor3 = Cores.fundo
 sidebar.BorderSizePixel = 0
 sidebar.Parent = painel
@@ -368,22 +410,22 @@ local botoesAba = {}
 local conteudosAba = {}
 
 local areaConteudo = Instance.new("Frame")
-areaConteudo.Size = UDim2.new(1, -130, 1, -70)
-areaConteudo.Position = UDim2.new(0, 130, 0, 42)
+areaConteudo.Size = UDim2.new(1, -140, 1, -72)
+areaConteudo.Position = UDim2.new(0, 140, 0, 44)
 areaConteudo.BackgroundTransparency = 1
 areaConteudo.Parent = painel
 
 for i, aba in ipairs(abas) do
     local botao = Instance.new("TextButton")
     botao.Name = "Aba_" .. aba.nome
-    botao.Size = UDim2.new(1, -10, 0, 44)
-    botao.Position = UDim2.new(0, 5, 0, (i - 1) * 48 + 8)
+    botao.Size = UDim2.new(1, -10, 0, 46)
+    botao.Position = UDim2.new(0, 5, 0, (i - 1) * 50 + 8)
     botao.BackgroundColor3 = Cores.fundoAba
     botao.BackgroundTransparency = 0.5
     botao.BorderSizePixel = 0
     botao.Text = aba.icone .. "  " .. aba.nome
     botao.TextColor3 = Cores.texto
-    botao.TextSize = 13
+    botao.TextSize = 14
     botao.Font = Enum.Font.GothamBold
     botao.AutoButtonColor = false
     botao.TextXAlignment = Enum.TextXAlignment.Left
@@ -438,6 +480,7 @@ for i, aba in ipairs(abas) do
     padding.Parent = conteudo
 end
 
+-- ============ FOOTER ============
 local footer = Instance.new("Frame")
 footer.Name = "Footer"
 footer.Size = UDim2.new(1, 0, 0, 28)
@@ -447,7 +490,7 @@ footer.BorderSizePixel = 0
 footer.Parent = painel
 
 local cantoFooter = Instance.new("UICorner")
-cantoFooter.CornerRadius = UDim.new(0, 12)
+cantoFooter.CornerRadius = UDim.new(0, 14)
 cantoFooter.Parent = footer
 
 local statusLabel = Instance.new("TextLabel")
@@ -471,15 +514,15 @@ fpsLabel.TextSize = 11
 fpsLabel.Font = Enum.Font.Gotham
 fpsLabel.Parent = footer
 
-local pingLabel = Instance.new("TextLabel")
-pingLabel.Size = UDim2.new(0.2, 0, 1, 0)
-pingLabel.Position = UDim2.new(0.6, 0, 0, 0)
-pingLabel.BackgroundTransparency = 1
-pingLabel.Text = "Ping: --ms"
-pingLabel.TextColor3 = Cores.cinza
-pingLabel.TextSize = 11
-pingLabel.Font = Enum.Font.Gotham
-pingLabel.Parent = footer
+local marLabel = Instance.new("TextLabel")
+marLabel.Size = UDim2.new(0.2, 0, 1, 0)
+marLabel.Position = UDim2.new(0.6, 0, 0, 0)
+marLabel.BackgroundTransparency = 1
+marLabel.Text = "Mar: " .. MAR
+marLabel.TextColor3 = Cores.cinza
+marLabel.TextSize = 11
+marLabel.Font = Enum.Font.Gotham
+marLabel.Parent = footer
 
 local playersLabel = Instance.new("TextLabel")
 playersLabel.Size = UDim2.new(0.2, 0, 1, 0)
@@ -492,6 +535,7 @@ playersLabel.Font = Enum.Font.Gotham
 playersLabel.TextXAlignment = Enum.TextXAlignment.Right
 playersLabel.Parent = footer
 
+-- ============ RESIZE HANDLE ============
 local resizeHandle = Instance.new("TextButton")
 resizeHandle.Size = UDim2.new(0, 20, 0, 20)
 resizeHandle.Position = UDim2.new(1, -20, 1, -20)
@@ -508,6 +552,7 @@ local cantoResize = Instance.new("UICorner")
 cantoResize.CornerRadius = UDim.new(0, 4)
 cantoResize.Parent = resizeHandle
 
+-- ============ NOTIFICACOES ============
 local notificacoes = {}
 
 local function notificar(titulo, texto, tipo)
@@ -528,7 +573,7 @@ local function notificar(titulo, texto, tipo)
     table.insert(notificacoes, notif)
 
     local canto = Instance.new("UICorner")
-    canto.CornerRadius = UDim.new(0, 8)
+    canto.CornerRadius = UDim.new(0, 10)
     canto.Parent = notif
 
     local stroke = Instance.new("UIStroke")
@@ -544,7 +589,7 @@ local function notificar(titulo, texto, tipo)
     barraCor.Parent = notif
 
     local cantoBarra = Instance.new("UICorner")
-    cantoBarra.CornerRadius = UDim.new(0, 8)
+    cantoBarra.CornerRadius = UDim.new(0, 10)
     cantoBarra.Parent = barraCor
 
     local lblTitulo = Instance.new("TextLabel")
@@ -583,7 +628,7 @@ local function notificar(titulo, texto, tipo)
         end
         TweenService:Create(notif, TweenInfo.new(0.3), {
             Position = UDim2.new(1, 20, 0, notif.Position.Y.Scale)
-        }):Play()
+        }):Play()        }):Play()
         task.wait(0.35)
         notif:Destroy()
     end)
@@ -980,7 +1025,7 @@ botaoMinimizar.MouseButton1Click:Connect(function()
         sidebar.Visible = false
         areaConteudo.Visible = false
         footer.Visible = false
-        TweenService:Create(painel, TweenInfo.new(0.3), {Size = UDim2.new(0, 620, 0, 42)}):Play()
+        TweenService:Create(painel, TweenInfo.new(0.3), {Size = UDim2.new(0, 620, 0, 44)}):Play()
         botaoMinimizar.Text = "+"
     else
         sidebar.Visible = true
@@ -1026,7 +1071,7 @@ end)
 
 local watermark = Instance.new("TextLabel")
 watermark.Name = "Watermark"
-watermark.Size = UDim2.new(0, 220, 0, 34)
+watermark.Size = UDim2.new(0, 240, 0, 34)
 watermark.Position = UDim2.new(0, 20, 0, 20)
 watermark.BackgroundColor3 = Cores.fundoPainel
 watermark.BackgroundTransparency = 0.3
@@ -1074,4 +1119,4 @@ RunService.RenderStepped:Connect(function()
 end)
 
 notificar("BF4X Premium", "Carregado! Sea " .. MAR, "sucesso")
-print("[BF4X] Premium v1.0 carregado! Sea " .. MAR)
+print("[BF4X] Premium v1.1 carregado! Sea " .. MAR)
