@@ -1,7 +1,7 @@
 --[[
     BF4X Premium - Blox Fruits Script
     Feito por Ewerton
-    Versao: 1.1 Premium
+    Versao: 1.2 Premium
     Compatibilidade: Arceus X
 ]]
 
@@ -17,7 +17,7 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
--- ============ DETECCAO DE MAR INTELIGENTE ============
+-- ============ DETECCAO DE MAR ============
 local function detectarMar()
     local nomeJogo = ""
     local sucesso, info = pcall(function()
@@ -49,11 +49,25 @@ local function detectarMar()
         return nil
     end
 
+    local PlaceIds = {
+        [2753915549] = 1,
+        [4442272183] = 2,
+        [7449423635] = 3,
+        [920587237] = 2,
+        [7909173265657] = 2,
+        [7909174109773] = 2
+    }
+
+    if PlaceIds[game.PlaceId] then
+        print("[BF4X] Detectado pelo PlaceId: " .. PlaceIds[game.PlaceId])
+        return PlaceIds[game.PlaceId]
+    end
+
     local mapa = workspace:FindFirstChild("Map") or workspace
 
     local ilhasMar = {
         [1] = {"Jungle", "Pirate Village", "Magma Village", "Marine Ford", "Fountain City", "Colosseum", "Prison"},
-        [2] = {"Kingdom of Rose", "Green Zone", "Cursed Ship", "Ice Castle", "Forgotten Island", "Graveyard", "Snow Mountain"},
+        [2] = {"Kingdom of Rose", "Green Zone", "Cursed Ship", "Ice Castle", "Forgotten Island", "Graveyard", "Snow Mountain", "Cafe", "Mansion"},
         [3] = {"Port Town", "Hydra Island", "Castle on the Sea", "Haunted Castle", "Floating Turtle", "Sea of Treats", "Tiki Outpost"}
     }
 
@@ -84,19 +98,13 @@ local function detectarMar()
         end
     end
 
-    if maiorContagem >= 1 then
+    if maiorContagem >= 3 then
+        print("[BF4X] Detectado pelas ilhas: " .. marDetectado)
         return marDetectado
     end
 
-    local PlaceIds = {
-        [2753915549] = 1,
-        [4442272183] = 2,
-        [7449423635] = 3,
-        [920587237] = 2,
-        [7909173265657] = 2
-    }
-
-    return PlaceIds[game.PlaceId]
+    print("[BF4X] Nao foi possivel detectar, forcando Sea 2")
+    return 2
 end
 
 local MAR = detectarMar()
@@ -143,7 +151,7 @@ local Textos = {
         rainbow = "Modo Rainbow",
         notifications = "Notificacoes",
         watermark = "Watermark",
-        creditos = "Feito por Ewerton\nVersao Premium 1.1\n\nUse com responsabilidade."
+        creditos = "Feito por Ewerton\nVersao Premium 1.2\n\nUse com responsabilidade."
     },
     en = {
         farm = "FARM", tp = "TP", esp = "ESP", move = "MOVE", visual = "VISUAL", cfg = "CFG", info = "INFO",
@@ -174,7 +182,7 @@ local Textos = {
         rainbow = "Rainbow Mode",
         notifications = "Notifications",
         watermark = "Watermark",
-        creditos = "Made by Ewerton\nPremium Version 1.1\n\nUse responsibly."
+        creditos = "Made by Ewerton\nPremium Version 1.2\n\nUse responsibly."
     },
     es = {
         farm = "FARM", tp = "TP", esp = "ESP", move = "MOVE", visual = "VISUAL", cfg = "CFG", info = "INFO",
@@ -205,7 +213,7 @@ local Textos = {
         rainbow = "Modo Arcoiris",
         notifications = "Notificaciones",
         watermark = "Marca de Agua",
-        creditos = "Hecho por Ewerton\nVersion Premium 1.1\n\nUsar con responsabilidad."
+        creditos = "Hecho por Ewerton\nVersion Premium 1.2\n\nUsar con responsabilidad."
     }
 }
 
@@ -535,7 +543,7 @@ playersLabel.Font = Enum.Font.Gotham
 playersLabel.TextXAlignment = Enum.TextXAlignment.Right
 playersLabel.Parent = footer
 
--- ============ RESIZE HANDLE ============
+-- ============ RESIZE ============
 local resizeHandle = Instance.new("TextButton")
 resizeHandle.Size = UDim2.new(0, 20, 0, 20)
 resizeHandle.Position = UDim2.new(1, -20, 1, -20)
@@ -615,9 +623,10 @@ local function notificar(titulo, texto, tipo)
     lblTexto.TextWrapped = true
     lblTexto.Parent = notif
 
-    TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+    local tweenIn = TweenService:Create(notif, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
         Position = UDim2.new(1, -300, 0, notif.Position.Y.Scale)
-    }):Play()
+    })
+    tweenIn:Play()
 
     task.delay(4, function()
         for i, v in ipairs(notificacoes) do
@@ -626,14 +635,16 @@ local function notificar(titulo, texto, tipo)
                 break
             end
         end
-        TweenService:Create(notif, TweenInfo.new(0.3), {
+        local tweenOut = TweenService:Create(notif, TweenInfo.new(0.3), {
             Position = UDim2.new(1, 20, 0, notif.Position.Y.Scale)
-        }):Play()
+        })
+        tweenOut:Play()
         task.wait(0.35)
         notif:Destroy()
     end)
 end
 
+-- ============ CRIAR SECAO ============
 local function criarSecao(parent, titulo, icone)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 30)
@@ -665,6 +676,7 @@ local function criarSecao(parent, titulo, icone)
     return container
 end
 
+-- ============ CRIAR TOGGLE ============
 local function criarToggle(parent, texto, callback, estadoInicial)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 36)
@@ -721,11 +733,15 @@ local function criarToggle(parent, texto, callback, estadoInicial)
     switchBotao.MouseButton1Click:Connect(function()
         ativo = not ativo
         if ativo then
-            TweenService:Create(switchBG, TweenInfo.new(0.2), {BackgroundColor3 = Cores.azul}):Play()
-            TweenService:Create(switchBotao, TweenInfo.new(0.2), {Position = UDim2.new(1, -20, 0.5, -9)}):Play()
+            local t1 = TweenService:Create(switchBG, TweenInfo.new(0.2), {BackgroundColor3 = Cores.azul})
+            t1:Play()
+            local t2 = TweenService:Create(switchBotao, TweenInfo.new(0.2), {Position = UDim2.new(1, -20, 0.5, -9)})
+            t2:Play()
         else
-            TweenService:Create(switchBG, TweenInfo.new(0.2), {BackgroundColor3 = Cores.cinzaEscuro}):Play()
-            TweenService:Create(switchBotao, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, -9)}):Play()
+            local t3 = TweenService:Create(switchBG, TweenInfo.new(0.2), {BackgroundColor3 = Cores.cinzaEscuro})
+            t3:Play()
+            local t4 = TweenService:Create(switchBotao, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, -9)})
+            t4:Play()
         end
         if callback then callback(ativo) end
     end)
@@ -733,6 +749,7 @@ local function criarToggle(parent, texto, callback, estadoInicial)
     return container
 end
 
+-- ============ CRIAR BOTAO ============
 local function criarBotao(parent, texto, callback)
     local botao = Instance.new("TextButton")
     botao.Size = UDim2.new(1, 0, 0, 36)
@@ -757,19 +774,23 @@ local function criarBotao(parent, texto, callback)
     stroke.Parent = botao
 
     botao.MouseEnter:Connect(function()
-        TweenService:Create(botao, TweenInfo.new(0.15), {
+        local t1 = TweenService:Create(botao, TweenInfo.new(0.15), {
             BackgroundColor3 = Cores.azulEscuro,
             BackgroundTransparency = 0.2
-        }):Play()
-        TweenService:Create(stroke, TweenInfo.new(0.15), {Transparency = 0.3}):Play()
+        })
+        t1:Play()
+        local t2 = TweenService:Create(stroke, TweenInfo.new(0.15), {Transparency = 0.3})
+        t2:Play()
     end)
 
     botao.MouseLeave:Connect(function()
-        TweenService:Create(botao, TweenInfo.new(0.15), {
+        local t1 = TweenService:Create(botao, TweenInfo.new(0.15), {
             BackgroundColor3 = Cores.fundoAba,
             BackgroundTransparency = 0.3
-        }):Play()
-        TweenService:Create(stroke, TweenInfo.new(0.15), {Transparency = 0.7}):Play()
+        })
+        t1:Play()
+        local t2 = TweenService:Create(stroke, TweenInfo.new(0.15), {Transparency = 0.7})
+        t2:Play()
     end)
 
     botao.MouseButton1Click:Connect(function()
@@ -779,6 +800,7 @@ local function criarBotao(parent, texto, callback)
     return botao
 end
 
+-- ============ CRIAR SLIDER ============
 local function criarSlider(parent, texto, min, max, valorInicial, callback)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 50)
@@ -888,6 +910,7 @@ local function criarSlider(parent, texto, min, max, valorInicial, callback)
     return container
 end
 
+-- ============ CRIAR DROPDOWN ============
 local function criarDropdown(parent, texto, opcoes, callback)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 36)
@@ -987,6 +1010,7 @@ local function criarDropdown(parent, texto, opcoes, callback)
     return container
 end
 
+-- ============ TROCAR ABA ============
 local function trocarAba(nomeAba)
     for nome, conteudo in pairs(conteudosAba) do
         conteudo.Visible = (nome == nomeAba)
@@ -994,17 +1018,19 @@ local function trocarAba(nomeAba)
     for nome, botao in pairs(botoesAba) do
         local indice = botao:FindFirstChild("Indice")
         if nome == nomeAba then
-            TweenService:Create(botao, TweenInfo.new(0.2), {
+            local t1 = TweenService:Create(botao, TweenInfo.new(0.2), {
                 BackgroundColor3 = Cores.azulEscuro,
                 BackgroundTransparency = 0.2
-            }):Play()
+            })
+            t1:Play()
             botao.TextColor3 = Cores.dourado
             if indice then indice.Visible = true end
         else
-            TweenService:Create(botao, TweenInfo.new(0.2), {
+            local t2 = TweenService:Create(botao, TweenInfo.new(0.2), {
                 BackgroundColor3 = Cores.fundoAba,
                 BackgroundTransparency = 0.5
-            }):Play()
+            })
+            t2:Play()
             botao.TextColor3 = Cores.texto
             if indice then indice.Visible = false end
         end
@@ -1017,6 +1043,7 @@ end
 
 trocarAba("FARM")
 
+-- ============ MINIMIZAR ============
 local minimizado = false
 
 botaoMinimizar.MouseButton1Click:Connect(function()
@@ -1025,13 +1052,15 @@ botaoMinimizar.MouseButton1Click:Connect(function()
         sidebar.Visible = false
         areaConteudo.Visible = false
         footer.Visible = false
-        TweenService:Create(painel, TweenInfo.new(0.3), {Size = UDim2.new(0, 620, 0, 44)}):Play()
+        local t = TweenService:Create(painel, TweenInfo.new(0.3), {Size = UDim2.new(0, 620, 0, 44)})
+        t:Play()
         botaoMinimizar.Text = "+"
     else
         sidebar.Visible = true
         areaConteudo.Visible = true
         footer.Visible = true
-        TweenService:Create(painel, TweenInfo.new(0.3), {Size = UDim2.new(0, 620, 0, 460)}):Play()
+        local t = TweenService:Create(painel, TweenInfo.new(0.3), {Size = UDim2.new(0, 620, 0, 460)})
+        t:Play()
         botaoMinimizar.Text = "−"
     end
 end)
@@ -1040,6 +1069,7 @@ botaoFechar.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
+-- ============ RESIZE ============
 local redimensionando = false
 local tamanhoInicial
 local posicaoInicial
@@ -1069,6 +1099,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
+-- ============ WATERMARK ============
 local watermark = Instance.new("TextLabel")
 watermark.Name = "Watermark"
 watermark.Size = UDim2.new(0, 240, 0, 34)
@@ -1092,6 +1123,7 @@ strokeWM.Thickness = 1
 strokeWM.Transparency = 0.3
 strokeWM.Parent = watermark
 
+-- ============ RAINBOW ============
 local hue = 0
 RunService.Heartbeat:Connect(function(dt)
     if Config.rainbow then
@@ -1105,6 +1137,7 @@ RunService.Heartbeat:Connect(function(dt)
     end
 end)
 
+-- ============ FPS COUNTER ============
 local frames = 0
 local ultimoTempo = tick()
 
@@ -1118,5 +1151,6 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
+-- ============ INICIALIZAR ============
 notificar("BF4X Premium", "Carregado! Sea " .. MAR, "sucesso")
-print("[BF4X] Premium v1.1 carregado! Sea " .. MAR)
+print("[BF4X] Premium v1.2 carregado! Sea " .. MAR)
