@@ -1,10 +1,3 @@
---[[
-    BF4X Premium - Blox Fruits Script
-    Feito por Ewerton
-    Versao: 2.0 Premium
-    Compatibilidade: Arceus X
-]]
-
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -17,7 +10,6 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
--- ============ DETECCAO DE MAR ============
 local function detectarMar()
     local nomeJogo = ""
     local sucesso, info = pcall(function()
@@ -63,9 +55,35 @@ local function detectarMar()
     local mapa = workspace:FindFirstChild("Map") or workspace
 
     local ilhasMar = {
-        [1] = {"Jungle", "Pirate Village", "Magma Village", "Marine Ford", "Fountain City", "Colosseum", "Prison"},
-        [2] = {"Kingdom of Rose", "Green Zone", "Cursed Ship", "Ice Castle", "Forgotten Island", "Graveyard", "Snow Mountain", "Cafe", "Mansion"},
-        [3] = {"Port Town", "Hydra Island", "Castle on the Sea", "Haunted Castle", "Floating Turtle", "Sea of Treats", "Tiki Outpost"}
+        [1] = {
+            "Jungle", "Selva",
+            "Pirate Village", "Vila Pirata",
+            "Magma Village", "Vila Magma",
+            "Marine Ford", "Marineford",
+            "Fountain City", "Cidade da Fonte",
+            "Colosseum", "Coliseu",
+            "Prison", "Prisao"
+        },
+        [2] = {
+            "Kingdom of Rose", "Reino das Rosas",
+            "Green Zone", "Zona Verde",
+            "Cursed Ship", "Navio Amaldicoado",
+            "Ice Castle", "Castelo de Gelo",
+            "Forgotten Island", "Ilha Esquecida",
+            "Graveyard", "Cemiterio",
+            "Snow Mountain", "Montanha Nevada",
+            "Cafe", "Cafeteria",
+            "Mansion", "Mansao"
+        },
+        [3] = {
+            "Port Town", "Cidade do Porto",
+            "Hydra Island", "Ilha Hydra",
+            "Castle on the Sea", "Castelo no Mar",
+            "Haunted Castle", "Castelo Assombrado",
+            "Floating Turtle", "Tartaruga Flutuante",
+            "Sea of Treats", "Mar de Guloseimas",
+            "Tiki Outpost", "Posto Tiki"
+        }
     }
 
     local contagem = {[1] = 0, [2] = 0, [3] = 0}
@@ -111,115 +129,15 @@ if CoreGui:FindFirstChild("BF4X") then
     CoreGui.BF4X:Destroy()
 end
 
--- ============ TEXTOS ============
 local Textos = {
     pt = {
-        farm = "FARM", tp = "TP", esp = "ESP", move = "MOVE", visual = "VISUAL", cfg = "CFG", info = "INFO",
-        autoFarmLevel = "Auto Farm Level",
-        autoFarmBoss = "Auto Farm Boss",
-        autoFarmFruit = "Auto Farm Fruta",
-        fastAttack = "Fast Attack",
-        autoChest = "Auto Chest",
-        autoHaki = "Auto Haki",
-        autoSword = "Auto Sword",
-        autoGun = "Auto Gun",
-        tpIslands = "Ilhas",
-        tpBosses = "Bosses",
-        tpSpecials = "Especiais",
-        tpPlayers = "Jogadores",
-        espPlayers = "ESP Players",
-        espFruits = "ESP Frutas",
-        espChests = "ESP Chests",
-        espEnemies = "ESP Enemies",
-        speed = "Speed",
-        fly = "Fly",
-        noclip = "Noclip",
-        infiniteJump = "Infinite Jump",
-        waterWalk = "Water Walk",
-        fullbright = "Fullbright",
-        noFog = "No Fog",
-        fpsBoost = "FPS Boost",
-        language = "Lingua",
-        panelColor = "Cor do Painel",
-        rainbow = "Modo Rainbow",
-        notifications = "Notificacoes",
-        creditos = "BF4X Premium v2.0\n\nFeito por Ewerton\n\nUse com responsabilidade.",
-        secaoFarm = "AUTO FARM",
-        secaoCombate = "COMBATE",
-        secaoColeta = "COLETA",
-        secaoConfig = "CONFIGURACOES"
+        creditos = "BF4X Premium v2.1\n\nFeito por Ewerton\n\nUse com responsabilidade."
     },
     en = {
-        farm = "FARM", tp = "TP", esp = "ESP", move = "MOVE", visual = "VISUAL", cfg = "CFG", info = "INFO",
-        autoFarmLevel = "Auto Farm Level",
-        autoFarmBoss = "Auto Farm Boss",
-        autoFarmFruit = "Auto Farm Fruit",
-        fastAttack = "Fast Attack",
-        autoChest = "Auto Chest",
-        autoHaki = "Auto Haki",
-        autoSword = "Auto Sword",
-        autoGun = "Auto Gun",
-        tpIslands = "Islands",
-        tpBosses = "Bosses",
-        tpSpecials = "Specials",
-        tpPlayers = "Players",
-        espPlayers = "ESP Players",
-        espFruits = "ESP Fruits",
-        espChests = "ESP Chests",
-        espEnemies = "ESP Enemies",
-        speed = "Speed",
-        fly = "Fly",
-        noclip = "Noclip",
-        infiniteJump = "Infinite Jump",
-        waterWalk = "Water Walk",
-        fullbright = "Fullbright",
-        noFog = "No Fog",
-        fpsBoost = "FPS Boost",
-        language = "Language",
-        panelColor = "Panel Color",
-        rainbow = "Rainbow Mode",
-        notifications = "Notifications",
-        creditos = "BF4X Premium v2.0\n\nMade by Ewerton\n\nUse responsibly.",
-        secaoFarm = "AUTO FARM",
-        secaoCombate = "COMBAT",
-        secaoColeta = "COLLECT",
-        secaoConfig = "SETTINGS"
+        creditos = "BF4X Premium v2.1\n\nMade by Ewerton\n\nUse responsibly."
     },
     es = {
-        farm = "FARM", tp = "TP", esp = "ESP", move = "MOVE", visual = "VISUAL", cfg = "CFG", info = "INFO",
-        autoFarmLevel = "Auto Farm Nivel",
-        autoFarmBoss = "Auto Farm Jefe",
-        autoFarmFruit = "Auto Farm Fruta",
-        fastAttack = "Ataque Rapido",
-        autoChest = "Auto Cofre",
-        autoHaki = "Auto Haki",
-        autoSword = "Auto Espada",
-        autoGun = "Auto Pistola",
-        tpIslands = "Islas",
-        tpBosses = "Jefes",
-        tpSpecials = "Especiales",
-        tpPlayers = "Jugadores",
-        espPlayers = "ESP Jugadores",
-        espFruits = "ESP Frutas",
-        espChests = "ESP Cofres",
-        espEnemies = "ESP Enemigos",
-        speed = "Velocidad",
-        fly = "Volar",
-        noclip = "Noclip",
-        infiniteJump = "Salto Infinito",
-        waterWalk = "Caminar en Agua",
-        fullbright = "Brillo Total",
-        noFog = "Sin Niebla",
-        fpsBoost = "Boost FPS",
-        language = "Idioma",
-        panelColor = "Color del Panel",
-        rainbow = "Modo Arcoiris",
-        notifications = "Notificaciones",
-        creditos = "BF4X Premium v2.0\n\nHecho por Ewerton\n\nUsar con responsabilidad.",
-        secaoFarm = "AUTO FARM",
-        secaoCombate = "COMBATE",
-        secaoColeta = "RECOLECCION",
-        secaoConfig = "CONFIGURACION"
+        creditos = "BF4X Premium v2.1\n\nHecho por Ewerton\n\nUsar con responsabilidad."
     }
 }
 
@@ -229,7 +147,6 @@ local function T(chave)
     return Textos[idiomaAtual][chave] or chave
 end
 
--- ============ CONFIG ============
 local Config = {
     mar = MAR,
     rainbow = false,
@@ -260,21 +177,20 @@ local Config = {
     fpsBoost = false,
 
     distanciaFarm = 100,
-    distanciaTp = 5
+    distanciaTp = 5,
+    mobEscolhido = "Auto (mais proximo)"
 }
 
 local Cores = {
     fundo = Color3.fromRGB(6, 6, 12),
     fundoPainel = Color3.fromRGB(14, 14, 24),
     fundoAba = Color3.fromRGB(22, 22, 36),
-    fundoSecundario = Color3.fromRGB(30, 30, 48),
     card = Color3.fromRGB(20, 20, 32),
     azul = Color3.fromRGB(0, 163, 255),
     azulClaro = Color3.fromRGB(100, 210, 255),
     azulEscuro = Color3.fromRGB(0, 90, 170),
     roxo = Color3.fromRGB(140, 60, 220),
     dourado = Color3.fromRGB(255, 215, 0),
-    douradoClaro = Color3.fromRGB(255, 235, 130),
     texto = Color3.fromRGB(240, 240, 255),
     cinza = Color3.fromRGB(140, 140, 170),
     cinzaEscuro = Color3.fromRGB(60, 60, 80),
@@ -283,7 +199,6 @@ local Cores = {
     laranja = Color3.fromRGB(255, 140, 0)
 }
 
--- ============ GUI ============
 local gui = Instance.new("ScreenGui")
 gui.Name = "BF4X"
 gui.ResetOnSpawn = false
@@ -320,7 +235,6 @@ gradientePainel.Color = ColorSequence.new{
 gradientePainel.Rotation = 135
 gradientePainel.Parent = painel
 
--- ============ HEADER ============
 local header = Instance.new("Frame")
 header.Name = "Header"
 header.Size = UDim2.new(1, 0, 0, 50)
@@ -436,7 +350,6 @@ local cantoFechar = Instance.new("UICorner")
 cantoFechar.CornerRadius = UDim.new(1, 0)
 cantoFechar.Parent = botaoFechar
 
--- ============ SIDEBAR ============
 local sidebar = Instance.new("Frame")
 sidebar.Name = "Sidebar"
 sidebar.Size = UDim2.new(0, 150, 1, -50)
@@ -542,7 +455,6 @@ for i, aba in ipairs(abas) do
     padding.Parent = conteudo
 end
 
--- ============ FOOTER ============
 local footer = Instance.new("Frame")
 footer.Name = "Footer"
 footer.Size = UDim2.new(1, 0, 0, 28)
@@ -601,14 +513,13 @@ local versaoLabel = Instance.new("TextLabel")
 versaoLabel.Size = UDim2.new(0, 100, 1, 0)
 versaoLabel.Position = UDim2.new(0.85, 0, 0, 0)
 versaoLabel.BackgroundTransparency = 1
-versaoLabel.Text = "v2.0"
+versaoLabel.Text = "v2.1"
 versaoLabel.TextColor3 = Cores.cinzaEscuro
 versaoLabel.TextSize = 11
 versaoLabel.Font = Enum.Font.Gotham
 versaoLabel.TextXAlignment = Enum.TextXAlignment.Right
 versaoLabel.Parent = footer
 
--- ============ RESIZE ============
 local resizeHandle = Instance.new("TextButton")
 resizeHandle.Size = UDim2.new(0, 22, 0, 22)
 resizeHandle.Position = UDim2.new(1, -26, 1, -26)
@@ -625,7 +536,6 @@ local cantoResize = Instance.new("UICorner")
 cantoResize.CornerRadius = UDim.new(0, 6)
 cantoResize.Parent = resizeHandle
 
--- ============ NOTIFICACOES ============
 local notificacoes = {}
 
 local function notificar(titulo, texto, tipo)
@@ -731,7 +641,6 @@ local function notificar(titulo, texto, tipo)
     end)
 end
 
--- ============ CRIAR SECAO ============
 local function criarSecao(parent, titulo, icone)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 34)
@@ -763,7 +672,6 @@ local function criarSecao(parent, titulo, icone)
     return container
 end
 
--- ============ CRIAR TOGGLE ============
 local function criarToggle(parent, texto, callback, estadoInicial)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 40)
@@ -842,7 +750,6 @@ local function criarToggle(parent, texto, callback, estadoInicial)
     return container
 end
 
--- ============ CRIAR BOTAO ============
 local function criarBotao(parent, texto, callback, cor)
     local botao = Instance.new("TextButton")
     botao.Size = UDim2.new(1, 0, 0, 38)
@@ -891,7 +798,6 @@ local function criarBotao(parent, texto, callback, cor)
     return botao
 end
 
--- ============ CRIAR SLIDER ============
 local function criarSlider(parent, texto, min, max, valorInicial, callback)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 54)
@@ -1001,7 +907,6 @@ local function criarSlider(parent, texto, min, max, valorInicial, callback)
     return container
 end
 
--- ============ CRIAR DROPDOWN ============
 local function criarDropdown(parent, texto, opcoes, callback)
     local container = Instance.new("Frame")
     container.Size = UDim2.new(1, 0, 0, 40)
@@ -1102,7 +1007,6 @@ local function criarDropdown(parent, texto, opcoes, callback)
     return container
 end
 
--- ============ CRIAR LABEL ============
 local function criarLabel(parent, texto, cor)
     local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, 0, 0, 24)
@@ -1117,7 +1021,6 @@ local function criarLabel(parent, texto, cor)
     return label
 end
 
--- ============ TROCAR ABA ============
 local function trocarAba(nomeAba)
     for nome, conteudo in pairs(conteudosAba) do
         conteudo.Visible = (nome == nomeAba)
@@ -1125,14 +1028,9 @@ local function trocarAba(nomeAba)
     for nome, botao in pairs(botoesAba) do
         local indice = botao:FindFirstChild("Indice")
         local texto = nil
-        local icone = nil
         for _, filho in ipairs(botao:GetChildren()) do
-            if filho:IsA("TextLabel") then
-                if filho.TextSize == 18 then
-                    icone = filho
-                else
-                    texto = filho
-                end
+            if filho:IsA("TextLabel") and filho.TextSize ~= 18 then
+                texto = filho
             end
         end
 
@@ -1162,7 +1060,82 @@ end
 
 trocarAba("FARM")
 
--- ============ MINIMIZAR ============
+local abaFARM = conteudosAba["FARM"]
+
+criarSecao(abaFARM, "AUTO FARM", "🎯")
+
+criarToggle(abaFARM, "Auto Farm Level", function(ativo)
+    Config.autoFarmLevel = ativo
+    if ativo then
+        notificar("Auto Farm", "Level ativado", "sucesso")
+    else
+        notificar("Auto Farm", "Level desativado", "aviso")
+    end
+end)
+
+criarToggle(abaFARM, "Auto Farm Boss", function(ativo)
+    Config.autoFarmBoss = ativo
+    if ativo then
+        notificar("Auto Farm", "Boss ativado", "sucesso")
+    else
+        notificar("Auto Farm", "Boss desativado", "aviso")
+    end
+end)
+
+criarToggle(abaFARM, "Auto Farm Fruta", function(ativo)
+    Config.autoFarmFruit = ativo
+    if ativo then
+        notificar("Auto Farm", "Fruta ativado", "sucesso")
+    else
+        notificar("Auto Farm", "Fruta desativado", "aviso")
+    end
+end)
+
+criarSecao(abaFARM, "COMBATE", "⚔")
+
+criarToggle(abaFARM, "Fast Attack", function(ativo)
+    Config.fastAttack = ativo
+end)
+
+criarToggle(abaFARM, "Auto Haki", function(ativo)
+    Config.autoHaki = ativo
+end)
+
+criarToggle(abaFARM, "Auto Sword", function(ativo)
+    Config.autoSword = ativo
+end)
+
+criarToggle(abaFARM, "Auto Gun", function(ativo)
+    Config.autoGun = ativo
+end)
+
+criarSecao(abaFARM, "COLETA", "📦")
+
+criarToggle(abaFARM, "Auto Chest", function(ativo)
+    Config.autoChest = ativo
+end)
+
+criarSecao(abaFARM, "CONFIGURACOES", "⚙")
+
+criarSlider(abaFARM, "Distancia do Farm", 10, 500, 100, function(valor)
+    Config.distanciaFarm = valor
+end)
+
+criarDropdown(abaFARM, "Mob para Farmar", {
+    "Auto (mais proximo)",
+    "Galley Captain",
+    "Diamond",
+    "Jeremy",
+    "Fajita",
+    "Don Swan",
+    "Smoke Admiral",
+    "Cursed Captain",
+    "Awakened Ice Admiral",
+    "Tide Keeper"
+}, function(escolha)
+    Config.mobEscolhido = escolha
+end)
+
 local minimizado = false
 
 botaoMinimizar.MouseButton1Click:Connect(function()
@@ -1190,7 +1163,6 @@ botaoFechar.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- ============ RESIZE ============
 local redimensionando = false
 local tamanhoInicial
 local posicaoInicial
@@ -1220,7 +1192,6 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- ============ RAINBOW ============
 local hue = 0
 RunService.Heartbeat:Connect(function(dt)
     if Config.rainbow then
@@ -1234,7 +1205,6 @@ RunService.Heartbeat:Connect(function(dt)
     end
 end)
 
--- =========== FPS COUNTER ============
 local frames = 0
 local ultimoTempo = tick()
 
@@ -1248,6 +1218,243 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- ============ INICIALIZAR ============
+local function pegarMobMaisProximo()
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
+
+    local minhaPos = char.HumanoidRootPart.Position
+    local melhor = nil
+    local menorDist = Config.distanciaFarm
+
+    for _, mob in ipairs(workspace:GetDescendants()) do
+        if mob:IsA("Model") and mob:FindFirstChild("Humanoid") and mob:FindFirstChild("HumanoidRootPart") then
+            if mob ~= char and not Players:GetPlayerFromCharacter(mob) then
+                local hum = mob:FindFirstChild("Humanoid")
+                if hum and hum.Health > 0 then
+                    local dist = (mob.HumanoidRootPart.Position - minhaPos).Magnitude
+                    if dist < menorDist then
+                        menorDist = dist
+                        melhor = mob
+                    end
+                end
+            end
+        end
+    end
+
+    return melhor
+end
+
+local function pegarFerramenta()
+    local char = LocalPlayer.Character
+    if not char then return nil end
+    return char:FindFirstChildOfClass("Tool")
+end
+
+local function atacarMob(mob)
+    if not mob or not mob:FindFirstChild("HumanoidRootPart") then return end
+
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+
+    local hrp = char.HumanoidRootPart
+
+    if Config.autoFarmLevel then
+        local mobPos = mob.HumanoidRootPart.Position
+        local posFinal = mobPos + (hrp.Position - mobPos).Unit * 3
+        hrp.CFrame = CFrame.new(posFinal, mobPos)
+    end
+
+    local ferramenta = pegarFerramenta()
+    if ferramenta then
+        pcall(function()
+            ferramenta:Activate()
+        end)
+    end
+end
+
+task.spawn(function()
+    while gui.Parent do
+        if Config.autoFarmLevel then
+            local mob = pegarMobMaisProximo()
+            if mob then
+                pcall(function()
+                    atacarMob(mob)
+                end)
+            end
+        end
+        task.wait(0.1)
+    end
+end)
+
+task.spawn(function()
+    while gui.Parent do
+        if Config.fastAttack then
+            local ferramenta = pegarFerramenta()
+            if ferramenta then
+                pcall(function()
+                    ferramenta:Activate()
+                end)
+            end
+        end
+        task.wait(0.05)
+    end
+end)
+
+task.spawn(function()
+    while gui.Parent do
+        if Config.autoHaki then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if char then
+                    local haki = char:FindFirstChild("Haki")
+                    if haki then
+                        haki:Activate()
+                    end
+                end
+            end)
+        end
+        task.wait(1)
+    end
+end)
+
+task.spawn(function()
+    while gui.Parent do
+        if Config.autoChest then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local minhaPos = char.HumanoidRootPart.Position
+                    for _, obj in ipairs(workspace:GetDescendants()) do
+                        if obj:IsA("Model") and (obj.Name:lower():find("chest") or obj.Name:lower():find("bau")) then
+                            local hrp = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Handle")
+                            if hrp then
+                                local dist = (hrp.Position - minhaPos).Magnitude
+                                if dist < Config.distanciaFarm then
+                                    char.HumanoidRootPart.CFrame = hrp.CFrame
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(0.5)
+    end
+end)
+
+task.spawn(function()
+    while gui.Parent do
+        if Config.speed then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("Humanoid") then
+                    char.Humanoid.WalkSpeed = 100
+                end
+            end)
+        else
+            pcall(function()
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("Humanoid") then
+                    char.Humanoid.WalkSpeed = 16
+                end
+            end)
+        end
+        task.wait(0.5)
+    end
+end)
+
+task.spawn(function()
+    while gui.Parent do
+        if Config.fly then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if char and char:FindFirstChild("HumanoidRootPart") then
+                    local hrp = char.HumanoidRootPart
+                    local camera = workspace.CurrentCamera
+                    local direcao = Vector3.new(0, 0, 0)
+
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                        direcao = direcao + camera.CFrame.LookVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                        direcao = direcao - camera.CFrame.LookVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                        direcao = direcao - camera.CFrame.RightVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                        direcao = direcao + camera.CFrame.RightVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                        direcao = direcao + Vector3.new(0, 1, 0)
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+                        direcao = direcao - Vector3.new(0, 1, 0)
+                    end
+
+                    if direcao.Magnitude > 0 then
+                        direcao = direcao.Unit * 60
+                    end
+
+                    hrp.Velocity = direcao
+                end
+            end)
+        end
+        task.wait(0.05)
+    end
+end)
+
+task.spawn(function()
+    while gui.Parent do
+        if Config.noclip then
+            pcall(function()
+                local char = LocalPlayer.Character
+                if char then
+                    for _, parte in ipairs(char:GetDescendants()) do
+                        if parte:IsA("BasePart") then
+                            parte.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(0.1)
+    end
+end)
+
+task.spawn(function()
+    while gui.Parent do
+        if Config.fullbright then
+            pcall(function()
+                Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+                Lighting.Brightness = 2
+                Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+            end)
+        end
+        task.wait(1)
+    end
+end)
+
+task.spawn(function()
+    while gui.Parent do
+        if Config.noFog then
+            pcall(function()
+                Lighting.FogEnd = 100000
+            end)
+        end
+        task.wait(1)
+    end
+end)
+
+UserInputService.JumpRequest:Connect(function()
+    if Config.infiniteJump then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
 notificar("BF4X Premium", "Carregado! Sea " .. MAR, "sucesso")
-print("[BF4X] Premium v2.0 carregado! Sea " .. MAR)
+print("[BF4X] Premium v2.1 carregado! Sea " .. MAR)
