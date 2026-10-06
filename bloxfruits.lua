@@ -1,10 +1,3 @@
---[[
-    BF4X Premium - Blox Fruits Script
-    Versao: 4.0
-    Feito por Ewerton
-]]
-
--- Serviços
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -12,174 +5,184 @@ local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local Camera = workspace.CurrentCamera
-local MarketplaceService = game:GetService("MarketplaceService")
+local HttpService = game:GetService("HttpService")
+local VirtualUser = game:GetService("VirtualUser")
+local TeleportService = game:GetService("TeleportService")
 
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 
--- ============ SISTEMA DE KEY (EXEMPLO) ============
--- Em um script real, a verificação seria feita em um servidor externo.
--- Aqui, usamos uma key fixa para demonstração.
+-- ============ SISTEMA DE KEY ============
 local KEY_CORRETA = "BF4X-PREMIUM-2026"
+local keySalva = ""
+
+pcall(function()
+    keySalva = readfile("bf4x_key.txt") or ""
+end)
 
 local function verificarKey()
-    local sucesso, keyDigitada = pcall(function()
-        return game:GetService("Players").LocalPlayer:GetJoinData().LaunchData
-    end)
-    
-    if not keyDigitada or keyDigitada == "" then
-        -- Tenta pegar do prompt do executor (funcionalidade comum em executores mobile)
-        keyDigitada = "BF4X-PREMIUM-2026" -- Simulação de key válida para testes
-    end
+    if keySalva == KEY_CORRETA then return true end
 
-    if keyDigitada == KEY_CORRETA then
-        return true
-    end
-    return false
-end
-
-if not verificarKey() then
-    -- Cria uma UI de Key
     local keyGui = Instance.new("ScreenGui")
     keyGui.Name = "BF4X_Key"
     keyGui.ResetOnSpawn = false
     keyGui.Parent = CoreGui
 
     local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 300, 0, 150)
-    frame.Position = UDim2.new(0.5, -150, 0.5, -75)
-    frame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    frame.Size = UDim2.new(0, 380, 0, 240)
+    frame.Position = UDim2.new(0.5, -190, 0.5, -120)
+    frame.BackgroundColor3 = Color3.fromRGB(20, 12, 35)
+    frame.BorderSizePixel = 0
     frame.Parent = keyGui
-    
-    local corner = Instance.new("UICorner")
-    corner.CornerRadius = UDim.new(0, 10)
-    corner.Parent = frame
 
-    local titulo = Instance.new("TextLabel")
-    titulo.Size = UDim2.new(1, 0, 0, 40)
-    titulo.Text = "BF4X - Verificação de Key"
-    titulo.TextColor3 = Color3.fromRGB(0, 163, 255)
-    titulo.TextSize = 16
-    titulo.Font = Enum.Font.GothamBold
-    titulo.Parent = frame
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 16)
+    c.Parent = frame
+
+    local s = Instance.new("UIStroke")
+    s.Color = Color3.fromRGB(140, 60, 220)
+    s.Thickness = 2
+    s.Parent = frame
+
+    local logo = Instance.new("TextLabel")
+    logo.Size = UDim2.new(1, 0, 0, 60)
+    logo.BackgroundTransparency = 1
+    logo.Text = "⚡ BF4X"
+    logo.TextColor3 = Color3.fromRGB(180, 100, 255)
+    logo.TextSize = 32
+    logo.Font = Enum.Font.GothamBlack
+    logo.Parent = frame
+
+    local sub = Instance.new("TextLabel")
+    sub.Size = UDim2.new(1, 0, 0, 20)
+    sub.Position = UDim2.new(0, 0, 0, 55)
+    sub.BackgroundTransparency = 1
+    sub.Text = "VERIFICACAO DE KEY"
+    sub.TextColor3 = Color3.fromRGB(200, 200, 220)
+    sub.TextSize = 11
+    sub.Font = Enum.Font.GothamBold
+    sub.Parent = frame
 
     local input = Instance.new("TextBox")
-    input.Size = UDim2.new(0.8, 0, 0, 30)
-    input.Position = UDim2.new(0.1, 0, 0.4, 0)
-    input.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    input.Size = UDim2.new(0.8, 0, 0, 40)
+    input.Position = UDim2.new(0.1, 0, 0, 100)
+    input.BackgroundColor3 = Color3.fromRGB(30, 20, 50)
+    input.BorderSizePixel = 0
     input.Text = ""
-    input.PlaceholderText = "Digite sua key..."
+    input.PlaceholderText = "Cole sua key aqui..."
     input.TextColor3 = Color3.fromRGB(255, 255, 255)
+    input.PlaceholderColor3 = Color3.fromRGB(120, 100, 150)
+    input.TextSize = 13
+    input.Font = Enum.Font.Gotham
     input.Parent = frame
 
+    local ci = Instance.new("UICorner")
+    ci.CornerRadius = UDim.new(0, 8)
+    ci.Parent = input
+
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.8, 0, 0, 30)
-    btn.Position = UDim2.new(0.1, 0, 0.7, 0)
-    btn.BackgroundColor3 = Color3.fromRGB(0, 163, 255)
-    btn.Text = "Verificar"
+    btn.Size = UDim2.new(0.8, 0, 0, 40)
+    btn.Position = UDim2.new(0.1, 0, 0, 155)
+    btn.BackgroundColor3 = Color3.fromRGB(140, 60, 220)
+    btn.BorderSizePixel = 0
+    btn.Text = "VERIFICAR"
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    btn.Font = Enum.Font.GothamBold
     btn.Parent = frame
+
+    local cbtn = Instance.new("UICorner")
+    cbtn.CornerRadius = UDim.new(0, 8)
+    cbtn.Parent = btn
+
+    local statusMsg = Instance.new("TextLabel")
+    statusMsg.Size = UDim2.new(1, 0, 0, 20)
+    statusMsg.Position = UDim2.new(0, 0, 1, -25)
+    statusMsg.BackgroundTransparency = 1
+    statusMsg.Text = "Insira a key para continuar"
+    statusMsg.TextColor3 = Color3.fromRGB(150, 150, 170)
+    statusMsg.TextSize = 10
+    statusMsg.Font = Enum.Font.Gotham
+    statusMsg.Parent = frame
 
     btn.MouseButton1Click:Connect(function()
         if input.Text == KEY_CORRETA then
+            statusMsg.Text = "Key valida! Carregando..."
+            statusMsg.TextColor3 = Color3.fromRGB(0, 220, 100)
+            pcall(function() writefile("bf4x_key.txt", KEY_CORRETA) end)
+            task.wait(1)
             keyGui:Destroy()
-            -- Recarrega o script principal
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/oewerton782-svg/Best-script/refs/heads/main/bloxfruits.lua"))()
         else
+            statusMsg.Text = "Key invalida! Tente novamente."
+            statusMsg.TextColor3 = Color3.fromRGB(220, 50, 50)
             input.Text = ""
-            input.PlaceholderText = "Key inválida!"
         end
     end)
+
+    return false
+end
+
+if not verificarKey() then
     return
 end
--- ================================================
 
-local function detectarMar()
-    local ids = {
-        [2753915549] = 1,
-        [4442272183] = 2,
-        [7449423635] = 3,
-        [920587237] = 2,
-        [7909173265657] = 3,
-        [7909174109773] = 3
-    }
-    if ids[game.PlaceId] then
-        return ids[game.PlaceId]
-    end
-    -- Fallback por ilhas
-    local mapa = workspace:FindFirstChild("Map") or workspace
-    local ilhas = {
-        [1] = {"Jungle", "Selva", "Pirate Village", "Magma Village", "Marine Ford", "Colosseum"},
-        [2] = {"Kingdom of Rose", "Green Zone", "Cursed Ship", "Ice Castle", "Forgotten Island", "Graveyard"},
-        [3] = {"Port Town", "Hydra Island", "Castle on the Sea", "Haunted Castle", "Floating Turtle", "Sea of Treats", "Tiki Outpost"}
-    }
-    local contagem = {[1] = 0, [2] = 0, [3] = 0}
-    for mar, lista in pairs(ilhas) do
-        for _, nome in ipairs(lista) do
-            for _, obj in ipairs(mapa:GetDescendants()) do
-                if obj.Name:lower():find(nome:lower()) then
-                    contagem[mar] = contagem[mar] + 1
-                    break
-                end
-            end
-        end
-    end
-    local melhor = 1
-    local maior = 0
-    for mar, qtd in pairs(contagem) do
-        if qtd > maior then
-            maior = qtd
-            melhor = mar
-        end
-    end
-    if maior >= 3 then return melhor end
-    if contagem[3] > 0 then return 3 end
-    if contagem[2] > 0 then return 2 end
-    return 1
-end
-
-local MAR = detectarMar()
+-- ============ SEA MANUAL ============
+local MAR = 2
 
 if CoreGui:FindFirstChild("BF4X") then
     CoreGui.BF4X:Destroy()
 end
 
+-- ============ CONFIG ============
 local Config = {
     mar = MAR,
     rainbow = false,
     notificacoes = true,
     autoFarmLevel = false,
     autoFarmBoss = false,
-    autoFarmFruit = false,
-    fastAttack = false,
     autoChest = false,
+    fruitSniper = false,
+    fastAttack = false,
+    mobAura = false,
     autoHaki = false,
+    autoEquipWeapon = true,
+    selectedWeaponType = "Sword", -- Melee, Sword, Blox Fruit, Gun
+    espPlayers = false,
+    espFruits = false,
+    espChests = false,
     speed = false,
     fly = false,
     noclip = false,
     infiniteJump = false,
+    waterWalk = false,
     fullbright = false,
     noFog = false,
-    distanciaFarm = 150, -- Aumentado para pegar mais mobs
-    mobEscolhido = "Auto (mais proximo)",
-    bossEscolhido = "Diamond"
+    fpsBoost = false,
+    antiAFK = true,
+    distanciaFarm = 100,
+    attackDelay = 0.1,
+    farmPosition = "Front",
+    selectedBoss = "Diamond",
+    scanRadius = 500
 }
 
+-- ============ CORES (REDZ HUB STYLE) ============
 local Cores = {
-    fundo = Color3.fromRGB(8, 8, 14),
-    painel = Color3.fromRGB(16, 16, 26),
-    card = Color3.fromRGB(24, 24, 38),
-    azul = Color3.fromRGB(0, 163, 255),
-    azulClaro = Color3.fromRGB(100, 210, 255),
-    dourado = Color3.fromRGB(255, 215, 0),
+    fundo = Color3.fromRGB(13, 8, 24),
+    painel = Color3.fromRGB(20, 12, 35),
+    card = Color3.fromRGB(30, 20, 48),
+    roxo = Color3.fromRGB(140, 60, 220),
+    roxoClaro = Color3.fromRGB(180, 100, 255),
+    roxoEscuro = Color3.fromRGB(80, 30, 140),
     texto = Color3.fromRGB(240, 240, 255),
-    cinza = Color3.fromRGB(140, 140, 170),
-    cinzaEscuro = Color3.fromRGB(60, 60, 80),
+    cinza = Color3.fromRGB(150, 140, 180),
+    cinzaEscuro = Color3.fromRGB(70, 60, 90),
     verde = Color3.fromRGB(0, 220, 100),
-    vermelho = Color3.fromRGB(220, 50, 50)
+    vermelho = Color3.fromRGB(220, 50, 50),
+    dourado = Color3.fromRGB(255, 215, 0)
 }
 
--- ============ CRIAÇÃO DA GUI ============
+-- ============ GUI ============
 local gui = Instance.new("ScreenGui")
 gui.Name = "BF4X"
 gui.ResetOnSpawn = false
@@ -188,8 +191,8 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = CoreGui
 
 local painel = Instance.new("Frame")
-painel.Size = UDim2.new(0, 620, 0, 480)
-painel.Position = UDim2.new(0.5, -310, 0.5, -240)
+painel.Size = UDim2.new(0, 700, 0, 480)
+painel.Position = UDim2.new(0.5, -350, 0.5, -240)
 painel.BackgroundColor3 = Cores.painel
 painel.BorderSizePixel = 0
 painel.Active = true
@@ -201,15 +204,24 @@ cantoPainel.CornerRadius = UDim.new(0, 14)
 cantoPainel.Parent = painel
 
 local bordaPainel = Instance.new("UIStroke")
-bordaPainel.Color = Cores.azul
+bordaPainel.Color = Cores.roxo
 bordaPainel.Thickness = 1.5
 bordaPainel.Transparency = 0.3
 bordaPainel.Parent = painel
 
+local gradPainel = Instance.new("UIGradient")
+gradPainel.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 18, 50)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(20, 12, 35)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(12, 8, 22))
+}
+gradPainel.Rotation = 135
+gradPainel.Parent = painel
+
 -- Header
 local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, 50)
-header.BackgroundColor3 = Cores.azul
+header.BackgroundColor3 = Cores.roxo
 header.BorderSizePixel = 0
 header.Parent = painel
 
@@ -219,8 +231,9 @@ cantoHeader.Parent = header
 
 local gradHeader = Instance.new("UIGradient")
 gradHeader.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 130, 230)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 70, 150))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(160, 70, 240)),
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(120, 50, 200)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(70, 25, 130))
 }
 gradHeader.Rotation = 0
 gradHeader.Parent = header
@@ -242,46 +255,36 @@ cantoMin.CornerRadius = UDim.new(1, 0)
 cantoMin.Parent = btnMin
 
 local titulo = Instance.new("TextLabel")
-titulo.Size = UDim2.new(0, 100, 1, 0)
-titulo.Position = UDim2.new(0, 50, 0, 0)
+titulo.Size = UDim2.new(0, 150, 1, 0)
+titulo.Position = UDim2.new(0, 52, 0, 0)
 titulo.BackgroundTransparency = 1
-titulo.Text = "⚡ BF4X"
-titulo.TextColor3 = Cores.texto
-titulo.TextSize = 20
+titulo.Text = "⚡ BF4X PREMIUM"
+titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
+titulo.TextSize = 19
 titulo.Font = Enum.Font.GothamBlack
 titulo.TextXAlignment = Enum.TextXAlignment.Left
 titulo.Parent = header
 
-local badge = Instance.new("Frame")
-badge.Size = UDim2.new(0, 75, 0, 22)
-badge.Position = UDim2.new(0.5, -37, 0.5, -11)
-badge.BackgroundColor3 = Cores.dourado
-badge.BorderSizePixel = 0
-badge.Parent = header
+local seaBadge = Instance.new("Frame")
+seaBadge.Size = UDim2.new(0, 100, 0, 24)
+seaBadge.Position = UDim2.new(0.5, -50, 0.5, -12)
+seaBadge.BackgroundColor3 = Cores.dourado
+seaBadge.BackgroundTransparency = 0.1
+seaBadge.BorderSizePixel = 0
+seaBadge.Parent = header
 
-local cantoBadge = Instance.new("UICorner")
-cantoBadge.CornerRadius = UDim.new(1, 0)
-cantoBadge.Parent = badge
+local cantoSeaBadge = Instance.new("UICorner")
+cantoSeaBadge.CornerRadius = UDim.new(1, 0)
+cantoSeaBadge.Parent = seaBadge
 
-local badgeTxt = Instance.new("TextLabel")
-badgeTxt.Size = UDim2.new(1, 0, 1, 0)
-badgeTxt.BackgroundTransparency = 1
-badgeTxt.Text = "PREMIUM"
-badgeTxt.TextColor3 = Color3.fromRGB(30, 20, 0)
-badgeTxt.TextSize = 10
-badgeTxt.Font = Enum.Font.GothamBold
-badgeTxt.Parent = badge
-
-local marTxt = Instance.new("TextLabel")
-marTxt.Size = UDim2.new(0, 80, 1, 0)
-marTxt.Position = UDim2.new(1, -120, 0, 0)
-marTxt.BackgroundTransparency = 1
-marTxt.Text = "SEA " .. MAR
-marTxt.TextColor3 = Cores.azulClaro
-marTxt.TextSize = 14
-marTxt.Font = Enum.Font.GothamBold
-marTxt.TextXAlignment = Enum.TextXAlignment.Right
-marTxt.Parent = header
+local seaTxt = Instance.new("TextLabel")
+seaTxt.Size = UDim2.new(1, 0, 1, 0)
+seaTxt.BackgroundTransparency = 1
+seaTxt.Text = "🌊 SEA " .. MAR
+seaTxt.TextColor3 = Color3.fromRGB(30, 20, 0)
+seaTxt.TextSize = 11
+seaTxt.Font = Enum.Font.GothamBold
+seaTxt.Parent = seaBadge
 
 local btnFechar = Instance.new("TextButton")
 btnFechar.Size = UDim2.new(0, 32, 0, 32)
@@ -301,7 +304,7 @@ cantoFechar.Parent = btnFechar
 
 -- Sidebar
 local sidebar = Instance.new("Frame")
-sidebar.Size = UDim2.new(0, 140, 1, -50)
+sidebar.Size = UDim2.new(0, 155, 1, -50)
 sidebar.Position = UDim2.new(0, 0, 0, 50)
 sidebar.BackgroundColor3 = Cores.fundo
 sidebar.BorderSizePixel = 0
@@ -309,6 +312,7 @@ sidebar.Parent = painel
 
 local abas = {
     {nome = "FARM", icone = "🎯"},
+    {nome = "COMBATE", icone = "⚔"},
     {nome = "TP", icone = "🌐"},
     {nome = "ESP", icone = "👁"},
     {nome = "MOVE", icone = "⚡"},
@@ -320,15 +324,15 @@ local btnAbas = {}
 local contentAbas = {}
 
 local area = Instance.new("Frame")
-area.Size = UDim2.new(1, -140, 1, -78)
-area.Position = UDim2.new(0, 140, 0, 50)
+area.Size = UDim2.new(1, -155, 1, -78)
+area.Position = UDim2.new(0, 155, 0, 50)
 area.BackgroundTransparency = 1
 area.Parent = painel
 
 for i, aba in ipairs(abas) do
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, -12, 0, 44)
-    btn.Position = UDim2.new(0, 6, 0, (i - 1) * 48 + 8)
+    btn.Size = UDim2.new(1, -12, 0, 40)
+    btn.Position = UDim2.new(0, 6, 0, (i - 1) * 44 + 8)
     btn.BackgroundColor3 = Cores.card
     btn.BackgroundTransparency = 0.5
     btn.BorderSizePixel = 0
@@ -342,21 +346,21 @@ for i, aba in ipairs(abas) do
     c.Parent = btn
 
     local icone = Instance.new("TextLabel")
-    icone.Size = UDim2.new(0, 30, 1, 0)
-    icone.Position = UDim2.new(0, 8, 0, 0)
+    icone.Size = UDim2.new(0, 26, 1, 0)
+    icone.Position = UDim2.new(0, 6, 0, 0)
     icone.BackgroundTransparency = 1
     icone.Text = aba.icone
-    icone.TextSize = 18
+    icone.TextSize = 16
     icone.Font = Enum.Font.GothamBold
     icone.Parent = btn
 
     local nome = Instance.new("TextLabel")
-    nome.Size = UDim2.new(1, -45, 1, 0)
-    nome.Position = UDim2.new(0, 42, 0, 0)
+    nome.Size = UDim2.new(1, -40, 1, 0)
+    nome.Position = UDim2.new(0, 36, 0, 0)
     nome.BackgroundTransparency = 1
     nome.Text = aba.nome
     nome.TextColor3 = Cores.cinza
-    nome.TextSize = 13
+    nome.TextSize = 11
     nome.Font = Enum.Font.GothamBold
     nome.TextXAlignment = Enum.TextXAlignment.Left
     nome.Parent = btn
@@ -365,7 +369,7 @@ for i, aba in ipairs(abas) do
     indice.Name = "Indice"
     indice.Size = UDim2.new(0, 3, 0.5, 0)
     indice.Position = UDim2.new(0, 0, 0.25, 0)
-    indice.BackgroundColor3 = Cores.azul
+    indice.BackgroundColor3 = Cores.roxoClaro
     indice.BorderSizePixel = 0
     indice.Visible = false
     indice.Parent = btn
@@ -379,7 +383,7 @@ for i, aba in ipairs(abas) do
     content.BackgroundTransparency = 1
     content.BorderSizePixel = 0
     content.ScrollBarThickness = 3
-    content.ScrollBarImageColor3 = Cores.azul
+    content.ScrollBarImageColor3 = Cores.roxo
     content.CanvasSize = UDim2.new(0, 0, 0, 0)
     content.AutomaticCanvasSize = Enum.AutomaticSize.Y
     content.Visible = false
@@ -387,15 +391,15 @@ for i, aba in ipairs(abas) do
     contentAbas[aba.nome] = content
 
     local pad = Instance.new("UIPadding")
-    pad.PaddingTop = UDim.new(0, 10)
-    pad.PaddingLeft = UDim.new(0, 12)
-    pad.PaddingRight = UDim.new(0, 12)
+    pad.PaddingTop = UDim.new(0, 8)
+    pad.PaddingLeft = UDim.new(0, 10)
+    pad.PaddingRight = UDim.new(0, 10)
     pad.PaddingBottom = UDim.new(0, 10)
     pad.Parent = content
 
     local layout = Instance.new("UIListLayout")
     layout.SortOrder = Enum.SortOrder.LayoutOrder
-    layout.Padding = UDim.new(0, 6) -- Aumentado para melhor espaçamento
+    layout.Padding = UDim.new(0, 4)
     layout.Parent = content
 end
 
@@ -423,7 +427,7 @@ cd.CornerRadius = UDim.new(1, 0)
 cd.Parent = dot
 
 local status = Instance.new("TextLabel")
-status.Size = UDim2.new(0, 80, 1, 0)
+status.Size = UDim2.new(0, 60, 1, 0)
 status.Position = UDim2.new(0, 28, 0, 0)
 status.BackgroundTransparency = 1
 status.Text = "Online"
@@ -434,8 +438,8 @@ status.TextXAlignment = Enum.TextXAlignment.Left
 status.Parent = footer
 
 local fpsTxt = Instance.new("TextLabel")
-fpsTxt.Size = UDim2.new(0, 80, 1, 0)
-fpsTxt.Position = UDim2.new(0.4, 0, 0, 0)
+fpsTxt.Size = UDim2.new(0, 70, 1, 0)
+fpsTxt.Position = UDim2.new(0.35, 0, 0, 0)
 fpsTxt.BackgroundTransparency = 1
 fpsTxt.Text = "FPS: 60"
 fpsTxt.TextColor3 = Cores.cinza
@@ -444,8 +448,8 @@ fpsTxt.Font = Enum.Font.Gotham
 fpsTxt.Parent = footer
 
 local playersTxt = Instance.new("TextLabel")
-playersTxt.Size = UDim2.new(0, 100, 1, 0)
-playersTxt.Position = UDim2.new(0.6, 0, 0, 0)
+playersTxt.Size = UDim2.new(0, 90, 1, 0)
+playersTxt.Position = UDim2.new(0.55, 0, 0, 0)
 playersTxt.BackgroundTransparency = 1
 playersTxt.Text = "0 players"
 playersTxt.TextColor3 = Cores.cinza
@@ -457,26 +461,26 @@ local vTxt = Instance.new("TextLabel")
 vTxt.Size = UDim2.new(0, 80, 1, 0)
 vTxt.Position = UDim2.new(1, -90, 0, 0)
 vTxt.BackgroundTransparency = 1
-vTxt.Text = "v4.0"
+vTxt.Text = "v9.0"
 vTxt.TextColor3 = Cores.cinzaEscuro
 vTxt.TextSize = 11
 vTxt.Font = Enum.Font.Gotham
 vTxt.TextXAlignment = Enum.TextXAlignment.Right
 vTxt.Parent = footer
 
--- ============ SISTEMA DE NOTIFICAÇÕES ============
+-- Notificações
 local notifs = {}
 
 local function notificar(titulo, texto, tipo)
     if not Config.notificacoes then return end
-    local cor = Cores.azul
+    local cor = Cores.roxo
     local icone = "ℹ"
     if tipo == "sucesso" then cor = Cores.verde; icone = "✓"
     elseif tipo == "erro" then cor = Cores.vermelho; icone = "✕"
     elseif tipo == "aviso" then cor = Cores.dourado; icone = "!" end
 
     local n = Instance.new("Frame")
-    n.Size = UDim2.new(0, 290, 0, 72)
+    n.Size = UDim2.new(0, 300, 0, 72)
     n.Position = UDim2.new(1, 20, 0, 100 + (#notifs * 80))
     n.BackgroundColor3 = Cores.painel
     n.BorderSizePixel = 0
@@ -537,16 +541,13 @@ local function notificar(titulo, texto, tipo)
     t2.Parent = n
 
     local tw = TweenService:Create(n, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-        Position = UDim2.new(1, -310, 0, n.Position.Y.Scale)
+        Position = UDim2.new(1, -320, 0, n.Position.Y.Scale)
     })
     tw:Play()
 
     task.delay(3.5, function()
         for i, v in ipairs(notifs) do
-            if v == n then
-                table.remove(notifs, i)
-                break
-            end
+            if v == n then table.remove(notifs, i); break end
         end
         local tw2 = TweenService:Create(n, TweenInfo.new(0.3), {
             Position = UDim2.new(1, 20, 0, n.Position.Y.Scale)
@@ -557,19 +558,18 @@ local function notificar(titulo, texto, tipo)
     end)
 end
 
--- ============ FUNÇÕES AUXILIARES DA UI ============
+-- Componentes
 local function criarSecao(parent, texto)
     local f = Instance.new("Frame")
-    f.Size = UDim2.new(1, 0, 0, 26)
+    f.Size = UDim2.new(1, 0, 0, 24)
     f.BackgroundTransparency = 1
     f.Parent = parent
-
     local l = Instance.new("TextLabel")
     l.Size = UDim2.new(1, 0, 1, 0)
     l.BackgroundTransparency = 1
     l.Text = texto
-    l.TextColor3 = Cores.dourado
-    l.TextSize = 12
+    l.TextColor3 = Cores.roxoClaro
+    l.TextSize = 11
     l.Font = Enum.Font.GothamBold
     l.TextXAlignment = Enum.TextXAlignment.Left
     l.Parent = f
@@ -577,7 +577,7 @@ end
 
 local function criarToggle(parent, texto, callback, inicial)
     local f = Instance.new("Frame")
-    f.Size = UDim2.new(1, 0, 0, 38)
+    f.Size = UDim2.new(1, 0, 0, 36)
     f.BackgroundColor3 = Cores.card
     f.BackgroundTransparency = 0.2
     f.BorderSizePixel = 0
@@ -589,18 +589,18 @@ local function criarToggle(parent, texto, callback, inicial)
 
     local l = Instance.new("TextLabel")
     l.Size = UDim2.new(0.7, 0, 1, 0)
-    l.Position = UDim2.new(0, 14, 0, 0)
+    l.Position = UDim2.new(0, 12, 0, 0)
     l.BackgroundTransparency = 1
     l.Text = texto
     l.TextColor3 = Cores.texto
-    l.TextSize = 12
+    l.TextSize = 11
     l.Font = Enum.Font.Gotham
     l.TextXAlignment = Enum.TextXAlignment.Left
     l.Parent = f
 
     local bg = Instance.new("Frame")
-    bg.Size = UDim2.new(0, 42, 0, 22)
-    bg.Position = UDim2.new(1, -56, 0.5, -11)
+    bg.Size = UDim2.new(0, 40, 0, 20)
+    bg.Position = UDim2.new(1, -52, 0.5, -10)
     bg.BackgroundColor3 = Cores.cinzaEscuro
     bg.BorderSizePixel = 0
     bg.Parent = f
@@ -610,8 +610,8 @@ local function criarToggle(parent, texto, callback, inicial)
     cb.Parent = bg
 
     local bt = Instance.new("TextButton")
-    bt.Size = UDim2.new(0, 18, 0, 18)
-    bt.Position = UDim2.new(0, 2, 0.5, -9)
+    bt.Size = UDim2.new(0, 16, 0, 16)
+    bt.Position = UDim2.new(0, 2, 0.5, -8)
     bt.BackgroundColor3 = Cores.texto
     bt.BorderSizePixel = 0
     bt.Text = ""
@@ -623,21 +623,21 @@ local function criarToggle(parent, texto, callback, inicial)
 
     local ativo = inicial or false
     if ativo then
-        bg.BackgroundColor3 = Cores.azul
-        bt.Position = UDim2.new(1, -20, 0.5, -9)
+        bg.BackgroundColor3 = Cores.roxo
+        bt.Position = UDim2.new(1, -18, 0.5, -8)
     end
 
     bt.MouseButton1Click:Connect(function()
         ativo = not ativo
         if ativo then
-            local t1 = TweenService:Create(bg, TweenInfo.new(0.2), {BackgroundColor3 = Cores.azul})
+            local t1 = TweenService:Create(bg, TweenInfo.new(0.2), {BackgroundColor3 = Cores.roxo})
             t1:Play()
-            local t2 = TweenService:Create(bt, TweenInfo.new(0.2), {Position = UDim2.new(1, -20, 0.5, -9)})
+            local t2 = TweenService:Create(bt, TweenInfo.new(0.2), {Position = UDim2.new(1, -18, 0.5, -8)})
             t2:Play()
         else
             local t3 = TweenService:Create(bg, TweenInfo.new(0.2), {BackgroundColor3 = Cores.cinzaEscuro})
             t3:Play()
-            local t4 = TweenService:Create(bt, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, -9)})
+            local t4 = TweenService:Create(bt, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, -8)})
             t4:Play()
         end
         if callback then callback(ativo) end
@@ -646,13 +646,13 @@ end
 
 local function criarBotao(parent, texto, callback)
     local b = Instance.new("TextButton")
-    b.Size = UDim2.new(1, 0, 0, 34)
+    b.Size = UDim2.new(1, 0, 0, 32)
     b.BackgroundColor3 = Cores.card
     b.BackgroundTransparency = 0.2
     b.BorderSizePixel = 0
     b.Text = texto
     b.TextColor3 = Cores.texto
-    b.TextSize = 12
+    b.TextSize = 11
     b.Font = Enum.Font.Gotham
     b.AutoButtonColor = false
     b.Parent = parent
@@ -662,23 +662,19 @@ local function criarBotao(parent, texto, callback)
     c.Parent = b
 
     local s = Instance.new("UIStroke")
-    s.Color = Cores.azul
+    s.Color = Cores.roxo
     s.Thickness = 1
     s.Transparency = 0.8
     s.Parent = b
 
     b.MouseEnter:Connect(function()
-        local t1 = TweenService:Create(b, TweenInfo.new(0.15), {BackgroundTransparency = 0})
+        local t1 = TweenService:Create(b, TweenInfo.new(0.15), {BackgroundTransparency = 0, BackgroundColor3 = Cores.roxoEscuro})
         t1:Play()
-        local t2 = TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.4})
-        t2:Play()
     end)
 
     b.MouseLeave:Connect(function()
-        local t1 = TweenService:Create(b, TweenInfo.new(0.15), {BackgroundTransparency = 0.2})
+        local t1 = TweenService:Create(b, TweenInfo.new(0.15), {BackgroundTransparency = 0.2, BackgroundColor3 = Cores.card})
         t1:Play()
-        local t2 = TweenService:Create(s, TweenInfo.new(0.15), {Transparency = 0.8})
-        t2:Play()
     end)
 
     b.MouseButton1Click:Connect(function()
@@ -688,7 +684,7 @@ end
 
 local function criarSlider(parent, texto, min, max, inicial, callback)
     local f = Instance.new("Frame")
-    f.Size = UDim2.new(1, 0, 0, 50)
+    f.Size = UDim2.new(1, 0, 0, 46)
     f.BackgroundColor3 = Cores.card
     f.BackgroundTransparency = 0.2
     f.BorderSizePixel = 0
@@ -699,30 +695,30 @@ local function criarSlider(parent, texto, min, max, inicial, callback)
     c.Parent = f
 
     local l = Instance.new("TextLabel")
-    l.Size = UDim2.new(0.6, 0, 0, 18)
-    l.Position = UDim2.new(0, 14, 0, 6)
+    l.Size = UDim2.new(0.6, 0, 0, 16)
+    l.Position = UDim2.new(0, 12, 0, 5)
     l.BackgroundTransparency = 1
     l.Text = texto
     l.TextColor3 = Cores.texto
-    l.TextSize = 12
+    l.TextSize = 11
     l.Font = Enum.Font.Gotham
     l.TextXAlignment = Enum.TextXAlignment.Left
     l.Parent = f
 
     local v = Instance.new("TextLabel")
-    v.Size = UDim2.new(0.3, 0, 0, 18)
-    v.Position = UDim2.new(0.65, 0, 0, 6)
+    v.Size = UDim2.new(0.3, 0, 0, 16)
+    v.Position = UDim2.new(0.65, 0, 0, 5)
     v.BackgroundTransparency = 1
     v.Text = tostring(inicial)
-    v.TextColor3 = Cores.azulClaro
-    v.TextSize = 12
+    v.TextColor3 = Cores.roxoClaro
+    v.TextSize = 11
     v.Font = Enum.Font.GothamBold
     v.TextXAlignment = Enum.TextXAlignment.Right
     v.Parent = f
 
     local bg = Instance.new("Frame")
-    bg.Size = UDim2.new(1, -28, 0, 6)
-    bg.Position = UDim2.new(0, 14, 0, 34)
+    bg.Size = UDim2.new(1, -24, 0, 6)
+    bg.Position = UDim2.new(0, 12, 0, 30)
     bg.BackgroundColor3 = Cores.cinzaEscuro
     bg.BorderSizePixel = 0
     bg.Parent = f
@@ -733,7 +729,7 @@ local function criarSlider(parent, texto, min, max, inicial, callback)
 
     local pre = Instance.new("Frame")
     pre.Size = UDim2.new((inicial - min) / (max - min), 0, 1, 0)
-    pre.BackgroundColor3 = Cores.azul
+    pre.BackgroundColor3 = Cores.roxo
     pre.BorderSizePixel = 0
     pre.Parent = bg
 
@@ -742,8 +738,8 @@ local function criarSlider(parent, texto, min, max, inicial, callback)
     cp.Parent = pre
 
     local bt = Instance.new("TextButton")
-    bt.Size = UDim2.new(0, 16, 0, 16)
-    bt.Position = UDim2.new((inicial - min) / (max - min), -8, 0.5, -8)
+    bt.Size = UDim2.new(0, 14, 0, 14)
+    bt.Position = UDim2.new((inicial - min) / (max - min), -7, 0.5, -7)
     bt.BackgroundColor3 = Cores.texto
     bt.BorderSizePixel = 0
     bt.Text = ""
@@ -760,7 +756,7 @@ local function criarSlider(parent, texto, min, max, inicial, callback)
         local pct = px / bg.AbsoluteSize.X
         local valor = math.floor(min + (max - min) * pct)
         pre.Size = UDim2.new(pct, 0, 1, 0)
-        bt.Position = UDim2.new(pct, -8, 0.5, -8)
+        bt.Position = UDim2.new(pct, -7, 0.5, -7)
         v.Text = tostring(valor)
         if callback then callback(valor) end
     end
@@ -793,6 +789,117 @@ local function criarSlider(parent, texto, min, max, inicial, callback)
     end)
 end
 
+local function criarDropdown(parent, texto, opcoes, callback)
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(1, 0, 0, 32)
+    container.BackgroundColor3 = Cores.card
+    container.BackgroundTransparency = 0.2
+    container.BorderSizePixel = 0
+    container.ClipsDescendants = false
+    container.ZIndex = 10
+    container.Parent = parent
+
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0, 8)
+    c.Parent = container
+
+    local l = Instance.new("TextLabel")
+    l.Size = UDim2.new(0.4, 0, 1, 0)
+    l.Position = UDim2.new(0, 12, 0, 0)
+    l.BackgroundTransparency = 1
+    l.Text = texto
+    l.TextColor3 = Cores.texto
+    l.TextSize = 11
+    l.Font = Enum.Font.Gotham
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.Parent = container
+
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.5, -12, 0, 24)
+    btn.Position = UDim2.new(0.5, 0, 0.5, -12)
+    btn.BackgroundColor3 = Cores.roxoEscuro
+    btn.BackgroundTransparency = 0.3
+    btn.BorderSizePixel = 0
+    btn.Text = opcoes[1] or "..."
+    btn.TextColor3 = Cores.texto
+    btn.TextSize = 11
+    btn.Font = Enum.Font.GothamBold
+    btn.ZIndex = 11
+    btn.Parent = container
+
+    local cb = Instance.new("UICorner")
+    cb.CornerRadius = UDim.new(0, 6)
+    cb.Parent = btn
+
+    local lista = Instance.new("Frame")
+    lista.Size = UDim2.new(0.5, -12, 0, #opcoes * 24)
+    lista.Position = UDim2.new(0.5, 0, 1, 2)
+    lista.BackgroundColor3 = Cores.painel
+    lista.BorderSizePixel = 0
+    lista.Visible = false
+    lista.ZIndex = 12
+    lista.Parent = container
+
+    local cl = Instance.new("UICorner")
+    cl.CornerRadius = UDim.new(0, 6)
+    cl.Parent = lista
+
+    local sl = Instance.new("UIStroke")
+    sl.Color = Cores.roxo
+    sl.Thickness = 1
+    sl.Transparency = 0.3
+    sl.Parent = lista
+
+    local aberto = false
+
+    for i, opcao in ipairs(opcoes) do
+        local item = Instance.new("TextButton")
+        item.Size = UDim2.new(1, 0, 0, 24)
+        item.Position = UDim2.new(0, 0, 0, (i - 1) * 24)
+        item.BackgroundTransparency = 1
+        item.Text = opcao
+        item.TextColor3 = Cores.texto
+        item.TextSize = 11
+        item.Font = Enum.Font.Gotham
+        item.ZIndex = 13
+        item.Parent = lista
+
+        item.MouseButton1Click:Connect(function()
+            btn.Text = opcao
+            lista.Visible = false
+            aberto = false
+            if callback then callback(opcao) end
+        end)
+
+        item.MouseEnter:Connect(function()
+            item.BackgroundTransparency = 0.7
+            item.BackgroundColor3 = Cores.roxo
+        end)
+
+        item.MouseLeave:Connect(function()
+            item.BackgroundTransparency = 1
+        end)
+    end
+
+    btn.MouseButton1Click:Connect(function()
+        aberto = not aberto
+        lista.Visible = aberto
+    end)
+end
+
+local function criarLabel(parent, texto, cor)
+    local l = Instance.new("TextLabel")
+    l.Size = UDim2.new(1, 0, 0, 22)
+    l.BackgroundTransparency = 1
+    l.Text = texto
+    l.TextColor3 = cor or Cores.cinza
+    l.TextSize = 11
+    l.Font = Enum.Font.Gotham
+    l.TextXAlignment = Enum.TextXAlignment.Left
+    l.TextWrapped = true
+    l.Parent = parent
+end
+
 local function trocarAba(nome)
     for n, c in pairs(contentAbas) do
         c.Visible = (n == nome)
@@ -801,17 +908,17 @@ local function trocarAba(nome)
         local ind = b:FindFirstChild("Indice")
         local txt = nil
         for _, f in ipairs(b:GetChildren()) do
-            if f:IsA("TextLabel") and f.TextSize ~= 18 then
+            if f:IsA("TextLabel") and f.TextSize ~= 16 then
                 txt = f
             end
         end
         if n == nome then
-            local t1 = TweenService:Create(b, TweenInfo.new(0.2), {BackgroundTransparency = 0.1})
+            local t1 = TweenService:Create(b, TweenInfo.new(0.2), {BackgroundTransparency = 0.1, BackgroundColor3 = Cores.roxoEscuro})
             t1:Play()
             if ind then ind.Visible = true end
-            if txt then txt.TextColor3 = Cores.azulClaro end
+            if txt then txt.TextColor3 = Cores.roxoClaro end
         else
-            local t2 = TweenService:Create(b, TweenInfo.new(0.2), {BackgroundTransparency = 0.5})
+            local t2 = TweenService:Create(b, TweenInfo.new(0.2), {BackgroundTransparency = 0.5, BackgroundColor3 = Cores.card})
             t2:Play()
             if ind then ind.Visible = false end
             if txt then txt.TextColor3 = Cores.cinza end
@@ -831,11 +938,11 @@ btnMin.MouseButton1Click:Connect(function()
     area.Visible = not visivel
     footer.Visible = not visivel
     if visivel then
-        local t = TweenService:Create(painel, TweenInfo.new(0.25), {Size = UDim2.new(0, 620, 0, 50)})
+        local t = TweenService:Create(painel, TweenInfo.new(0.25), {Size = UDim2.new(0, 700, 0, 50)})
         t:Play()
         btnMin.Text = "+"
     else
-        local t = TweenService:Create(painel, TweenInfo.new(0.25), {Size = UDim2.new(0, 620, 0, 480)})
+        local t = TweenService:Create(painel, TweenInfo.new(0.25), {Size = UDim2.new(0, 700, 0, 480)})
         t:Play()
         btnMin.Text = "−"
     end
@@ -845,208 +952,190 @@ btnFechar.MouseButton1Click:Connect(function()
     gui:Destroy()
 end)
 
--- ============ LÓGICA DE AUTO FARM ============
-local function getClosestMob(maxDistance)
-    local closestMob = nil
-    local shortestDistance = maxDistance or Config.distanciaFarm
+local frames = 0
+local ultimo = tick()
+
+RunService.RenderStepped:Connect(function()
+    frames = frames + 1
+    if tick() - ultimo >= 1 then
+        fpsTxt.Text = "FPS: " .. frames
+        frames = 0
+        ultimo = tick()
+        playersTxt.Text = #Players:GetPlayers() .. " players"
+    end
+end)
+
+local hue = 0
+RunService.Heartbeat:Connect(function(dt)
+    if Config.rainbow then
+        hue = (hue + dt * 0.3) % 1
+        local cor = Color3.fromHSV(hue, 1, 1)
+        header.BackgroundColor3 = cor
+        bordaPainel.Color = cor
+    else
+        header.BackgroundColor3 = Cores.roxo
+        bordaPainel.Color = Cores.roxo
+    end
+end)
+
+-- ============ FUNÇÕES AUXILIARES ============
+
+local function equiparArma()
     local char = LocalPlayer.Character
+    if not char then return end
+    
+    if char:FindFirstChildOfClass("Tool") then return end
+    
+    local backpack = LocalPlayer:FindFirstChild("Backpack")
+    if not backpack then return end
+    
+    local tipo = Config.selectedWeaponType
+    local prioridades = {
+        ["Sword"] = {"sword", "katana", "blade", "cutlass", "saber", "dark", "dragon", "trident", "cursed", "pipe"},
+        ["Melee"] = {"combat", "black leg", "electro", "fishman karate", "dragon claw", "superhuman", "death step", "sharkman karate"},
+        ["Gun"] = {"gun", "pistol", "rifle", "shotgun", "smg", "sniper", "bazooka", "cannon"},
+        ["Blox Fruit"] = {"fruit", "bomb", "spike", "flame", "ice", "light", "dark", "rubber", "barrier", "magma", "door", "quake", "human", "buddha", "love", "spider", "sound", "phoenix", "portal", "rumble", "pain", "blizzard", "gravity", "mammoth", "gas", "t-rex", "dough", "shadow", "venom", "control", "spirit", "dragon", "kitsune", "leopard"}
+    }
+    
+    local keywords = prioridades[tipo] or {}
+    
+    for _, item in ipairs(backpack:GetChildren()) do
+        if item:IsA("Tool") then
+            local nome = item.Name:lower()
+            for _, kw in ipairs(keywords) do
+                if nome:find(kw) then
+                    item.Parent = char
+                    return
+                end
+            end
+        end
+    end
+    
+    for _, item in ipairs(backpack:GetChildren()) do
+        if item:IsA("Tool") then
+            item.Parent = char
+            return
+        end
+    end
+end
 
+local function getClosestMob(filtro)
+    local char = LocalPlayer.Character
     if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
-
+    
+    local melhor = nil
+    local menor = Config.distanciaFarm
+    
     for _, mob in ipairs(workspace:GetDescendants()) do
         if mob:IsA("Model") and mob:FindFirstChild("Humanoid") and mob:FindFirstChild("HumanoidRootPart") then
             if mob ~= char and not Players:GetPlayerFromCharacter(mob) then
                 local hum = mob:FindFirstChild("Humanoid")
                 if hum and hum.Health > 0 then
-                    local dist = (mob.HumanoidRootPart.Position - char.HumanoidRootPart.Position).Magnitude
-                    if dist < shortestDistance then
-                        shortestDistance = dist
-                        closestMob = mob
-                    end
-                end
-            end
-        end
-    end
-    return closestMob
-end
-
-local function attackMob(mob)
-    if not mob or not mob:FindFirstChild("HumanoidRootPart") then return end
-    local char = LocalPlayer.Character
-    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-    local tool = char:FindFirstChildOfClass("Tool")
-    if tool then
-        pcall(function() tool:Activate() end)
-    end
-end
-
-task.spawn(function()
-    while gui.Parent do
-        if Config.autoFarmLevel then
-            local mob = getClosestMob()
-            if mob then
-                local char = LocalPlayer.Character
-                if char and char:FindFirstChild("HumanoidRootPart") then
-                    local mobPos = mob.HumanoidRootPart.Position
-                    local charPos = char.HumanoidRootPart.Position
-                    local distance = (mobPos - charPos).Magnitude
-                    if distance > 5 then
-                        local tweenTime = math.clamp(distance / 100, 0.1, 0.5)
-                        local tweenInfo = TweenInfo.new(tweenTime, Enum.EasingStyle.Linear)
-                        local targetCFrame = CFrame.new(mobPos + (charPos - mobPos).Unit * 3, mobPos)
-                        local tween = TweenService:Create(char.HumanoidRootPart, tweenInfo, {CFrame = targetCFrame})
-                        tween:Play()
-                        tween.Completed:Wait()
-                    end
-                    attackMob(mob)
-                end
-            end
-        end
-        task.wait(0.1)
-    end
-end)
-
-task.spawn(function()
-    while gui.Parent do
-        if Config.fastAttack then
-            local char = LocalPlayer.Character
-            if char then
-                local tool = char:FindFirstChildOfClass("Tool")
-                if tool then
-                    pcall(function() tool:Activate() end)
-                end
-            end
-        end
-        task.wait(0.05)
-    end
-end)
-
-task.spawn(function()
-    while gui.Parent do
-        if Config.autoHaki then
-            local char = LocalPlayer.Character
-            if char then
-                local haki = char:FindFirstChild("Haki")
-                if haki then
-                    pcall(function() haki:Activate() end)
-                end
-            end
-        end
-        task.wait(1)
-    end
-end)
-
-task.spawn(function()
-    while gui.Parent do
-        if Config.autoChest then
-            local char = LocalPlayer.Character
-            if char and char:FindFirstChild("HumanoidRootPart") then
-                local minhaPos = char.HumanoidRootPart.Position
-                for _, obj in ipairs(workspace:GetDescendants()) do
-                    if obj:IsA("Model") and (obj.Name:lower():find("chest") or obj.Name:lower():find("bau")) then
-                        local hrp = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Handle")
-                        if hrp then
-                            local dist = (hrp.Position - minhaPos).Magnitude
-                            if dist < Config.distanciaFarm then
-                                char.HumanoidRootPart.CFrame = hrp.CFrame
-                                break
-                            end
+                    if not filtro or mob.Name:lower():find(filtro:lower()) then
+                        local dist = (mob.HumanoidRootPart.Position - char.HumanoidRootPart.Position).Magnitude
+                        if dist < menor then
+                            menor = dist
+                            melhor = mob
                         end
                     end
                 end
             end
         end
-        task.wait(0.5)
     end
-end)
+    return melhor
+end
 
-task.spawn(function()
-    while gui.Parent do
-        if Config.fly then
-            local char = LocalPlayer.Character
-            if char and char:FindFirstChild("HumanoidRootPart") then
-                local hrp = char.HumanoidRootPart
-                local dir = Vector3.new(0, 0, 0)
-                if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + Camera.CFrame.LookVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - Camera.CFrame.LookVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - Camera.CFrame.RightVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + Camera.CFrame.RightVector end
-                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then dir = dir + Vector3.new(0, 1, 0) end
-                if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then dir = dir - Vector3.new(0, 1, 0) end
-                if dir.Magnitude > 0 then dir = dir.Unit * 60 end
-                hrp.Velocity = dir
-            end
-        end
-        task.wait(0.05)
-    end
-end)
-
-task.spawn(function()
-    while gui.Parent do
-        if Config.noclip then
-            local char = LocalPlayer.Character
-            if char then
-                for _, p in ipairs(char:GetDescendants()) do
-                    if p:IsA("BasePart") then
-                        p.CanCollide = false
-                    end
+local function getClosestChest()
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
+    
+    local melhor = nil
+    local menor = Config.distanciaFarm
+    
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("Model") and (obj.Name:lower():find("chest") or obj.Name:lower():find("bau")) then
+            local hrp = obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChild("Handle")
+            if hrp then
+                local dist = (hrp.Position - char.HumanoidRootPart.Position).Magnitude
+                if dist < menor then
+                    menor = dist
+                    melhor = obj
                 end
             end
         end
-        task.wait(0.1)
     end
-end)
+    return melhor
+end
 
-task.spawn(function()
-    while gui.Parent do
-        if Config.fullbright then
-            Lighting.Ambient = Color3.fromRGB(255, 255, 255)
-            Lighting.Brightness = 2
-            Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
-        end
-        task.wait(1)
-    end
-end)
-
-task.spawn(function()
-    while gui.Parent do
-        if Config.noFog then
-            Lighting.FogEnd = 100000
-        end
-        task.wait(1)
-    end
-end)
-
-UserInputService.JumpRequest:Connect(function()
-    if Config.infiniteJump then
-        local char = LocalPlayer.Character
-        if char and char:FindFirstChild("Humanoid") then
-            char.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+local function getClosestFruit()
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
+    
+    local melhor = nil
+    local menor = Config.scanRadius
+    
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("Tool") and obj:FindFirstChild("Handle") then
+            if obj.Name:lower():find("fruit") then
+                local dist = (obj.Handle.Position - char.HumanoidRootPart.Position).Magnitude
+                if dist < menor then
+                    menor = dist
+                    melhor = obj
+                end
+            end
         end
     end
-end)
+    return melhor
+end
 
--- ============ CONSTRUÇÃO DAS ABAS ============
+local function voarAte(pos)
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    
+    local hrp = char.HumanoidRootPart
+    local dist = (pos - hrp.Position).Magnitude
+    
+    if dist > 5 then
+        local tweenTime = math.min(dist / 200, 1)
+        local tween = TweenService:Create(hrp, TweenInfo.new(tweenTime, Enum.EasingStyle.Linear), {
+            CFrame = CFrame.new(pos)
+        })
+        tween:Play()
+        tween.Completed:Wait()
+    end
+end
 
--- Aba FARM
+-- ============ ABAS ============
+
+-- FARM
 local abaFARM = contentAbas["FARM"]
 criarSecao(abaFARM, "🎯 AUTO FARM")
 criarToggle(abaFARM, "Auto Farm Level", function(v) Config.autoFarmLevel = v end)
 criarToggle(abaFARM, "Auto Farm Boss", function(v) Config.autoFarmBoss = v end)
-criarToggle(abaFARM, "Auto Farm Fruta", function(v) Config.autoFarmFruit = v end)
-
-criarSecao(abaFARM, "⚔ COMBATE")
-criarToggle(abaFARM, "Fast Attack", function(v) Config.fastAttack = v end)
-criarToggle(abaFARM, "Auto Haki", function(v) Config.autoHaki = v end)
-
-criarSecao(abaFARM, "📦 COLETA")
 criarToggle(abaFARM, "Auto Chest", function(v) Config.autoChest = v end)
+criarToggle(abaFARM, "Fruit Sniper", function(v) Config.fruitSniper = v end)
 
-criarSecao(abaFARM, "⚙ CONFIGURAÇÕES")
-criarSlider(abaFARM, "Distancia do Farm", 10, 500, 150, function(v) Config.distanciaFarm = v end)
+criarSecao(abaFARM, "⚙ CONFIG FARM")
+criarSlider(abaFARM, "Distancia do Farm", 10, 500, 100, function(v) Config.distanciaFarm = v end)
+criarDropdown(abaFARM, "Farm Position", {"Front", "Above", "Below", "Behind"}, function(v) Config.farmPosition = v end)
 
--- Aba TP
+-- COMBATE
+local abaCOMBATE = contentAbas["COMBATE"]
+criarSecao(abaCOMBATE, "⚔ COMBATE")
+criarToggle(abaCOMBATE, "Fast Attack", function(v) Config.fastAttack = v end)
+criarToggle(abaCOMBATE, "Mob Aura", function(v) Config.mobAura = v end)
+criarToggle(abaCOMBATE, "Auto Haki", function(v) Config.autoHaki = v end)
+
+criarSecao(abaCOMBATE, "🗡 SELECIONAR ARMA")
+criarToggle(abaCOMBATE, "Auto Equip Weapon", function(v) Config.autoEquipWeapon = v end, true)
+criarDropdown(abaCOMBATE, "Tipo de Arma", {"Melee", "Sword", "Blox Fruit", "Gun"}, function(v) Config.selectedWeaponType = v end)
+
+criarSecao(abaCOMBATE, "⚙ CONFIG COMBATE")
+criarSlider(abaCOMBATE, "Attack Delay (ms)", 10, 200, 50, function(v) Config.attackDelay = v / 1000 end)
+
+-- TP
 local abaTP = contentAbas["TP"]
+
 local ilhasPorMar = {
     [1] = {
         {nome = "Starter Island", pos = Vector3.new(0, 20, 0)},
@@ -1094,11 +1183,8 @@ criarSecao(abaTP, "🌐 ILHAS - SEA " .. MAR)
 local ilhasAtuais = ilhasPorMar[MAR] or ilhasPorMar[2]
 for _, ilha in ipairs(ilhasAtuais) do
     criarBotao(abaTP, "📍 " .. ilha.nome, function()
-        local char = LocalPlayer.Character
-        if char and char:FindFirstChild("HumanoidRootPart") then
-            char.HumanoidRootPart.CFrame = CFrame.new(ilha.pos)
-            notificar("Teleporte", "Indo para " .. ilha.nome, "sucesso")
-        end
+        voarAte(ilha.pos)
+        notificar("TP", "Indo para " .. ilha.nome, "sucesso")
     end)
 end
 
@@ -1143,28 +1229,20 @@ criarSecao(abaTP, "👹 BOSSES")
 local bossesAtuais = bossesPorMar[MAR] or bossesPorMar[2]
 for _, boss in ipairs(bossesAtuais) do
     criarBotao(abaTP, "👹 " .. boss.nome, function()
-        local char = LocalPlayer.Character
-        if char and char:FindFirstChild("HumanoidRootPart") then
-            char.HumanoidRootPart.CFrame = CFrame.new(boss.pos)
-            notificar("Teleporte", "Indo para " .. boss.nome, "sucesso")
-        end
+        voarAte(boss.pos)
+        notificar("TP", "Indo para " .. boss.nome, "sucesso")
     end)
 end
 
--- Aba ESP
+-- ESP
 local abaESP = contentAbas["ESP"]
 criarSecao(abaESP, "👁 ESP")
-criarToggle(abaESP, "ESP Players", function(v)
-    notificar("ESP", "ESP Players: " .. tostring(v), "info")
-end)
-criarToggle(abaESP, "ESP Frutas", function(v)
-    notificar("ESP", "ESP Frutas: " .. tostring(v), "info")
-end)
-criarToggle(abaESP, "ESP Chests", function(v)
-    notificar("ESP", "ESP Chests: " .. tostring(v), "info")
-end)
+criarToggle(abaESP, "ESP Players", function(v) Config.espPlayers = v end)
+criarToggle(abaESP, "ESP Frutas", function(v) Config.espFruits = v end)
+criarToggle(abaESP, "ESP Chests", function(v) Config.espChests = v end)
+criarLabel(abaESP, "ESP está em desenvolvimento", Cores.cinza)
 
--- Aba MOVE
+-- MOVE
 local abaMOVE = contentAbas["MOVE"]
 criarSecao(abaMOVE, "⚡ MOVIMENTO")
 criarToggle(abaMOVE, "Speed", function(v)
@@ -1177,13 +1255,18 @@ end)
 criarToggle(abaMOVE, "Fly", function(v) Config.fly = v end)
 criarToggle(abaMOVE, "Noclip", function(v) Config.noclip = v end)
 criarToggle(abaMOVE, "Infinite Jump", function(v) Config.infiniteJump = v end)
+criarToggle(abaMOVE, "Walk on Water", function(v) Config.waterWalk = v end)
 
--- Aba VISUAL
+-- VISUAL
 local abaVISUAL = contentAbas["VISUAL"]
 criarSecao(abaVISUAL, "🎨 VISUAL")
 criarToggle(abaVISUAL, "Fullbright", function(v)
     Config.fullbright = v
-    if not v then
+    if v then
+        Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+        Lighting.Brightness = 2
+        Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
+    else
         Lighting.Ambient = Color3.fromRGB(70, 70, 70)
         Lighting.Brightness = 1
         Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
@@ -1191,43 +1274,295 @@ criarToggle(abaVISUAL, "Fullbright", function(v)
 end)
 criarToggle(abaVISUAL, "No Fog", function(v)
     Config.noFog = v
-    if not v then
-        Lighting.FogEnd = 1000
+    Lighting.FogEnd = v and 100000 or 1000
+end)
+criarToggle(abaVISUAL, "FPS Boost", function(v)
+    Config.fpsBoost = v
+    if v then
+        Lighting.GlobalShadows = false
+        Lighting.ShadowSoftness = 0
+    else
+        Lighting.GlobalShadows = true
+        Lighting.ShadowSoftness = 0.2
     end
 end)
 
--- Aba CFG
+-- CFG
 local abaCFG = contentAbas["CFG"]
-criarSecao(abaCFG, "⚙ CONFIGURAÇÕES")
+criarSecao(abaCFG, "🌊 SEA ATUAL")
+criarDropdown(abaCFG, "Escolha seu Sea", {"Sea 1", "Sea 2", "Sea 3"}, function(escolha)
+    if escolha == "Sea 1" then MAR = 1
+    elseif escolha == "Sea 2" then MAR = 2
+    elseif escolha == "Sea 3" then MAR = 3 end
+    Config.mar = MAR
+    seaTxt.Text = "🌊 SEA " .. MAR
+    notificar("Sea", "Agora no " .. escolha, "sucesso")
+end)
+
+criarSecao(abaCFG, "⚙ CONFIGURACOES")
 criarToggle(abaCFG, "Notificações", function(v) Config.notificacoes = v end, true)
 criarToggle(abaCFG, "Modo Rainbow", function(v) Config.rainbow = v end)
+criarToggle(abaCFG, "Anti-AFK", function(v) Config.antiAFK = v end, true)
+criarLabel(abaCFG, "BF4X Premium v9.0\nKey: BF4X-PREMIUM-2026\nFeito por Ewerton", Cores.roxoClaro)
 
--- ============ LOOPS GLOBAIS ============
-local frames = 0
-local ultimo = tick()
+-- ============ LOOPS ============
 
-RunService.RenderStepped:Connect(function()
-    frames = frames + 1
-    if tick() - ultimo >= 1 then
-        fpsTxt.Text = "FPS: " .. frames
-        frames = 0
-        ultimo = tick()
-        playersTxt.Text = #Players:GetPlayers() .. " players"
+-- Anti-AFK
+task.spawn(function()
+    while gui.Parent do
+        if Config.antiAFK then
+            VirtualUser:CaptureController()
+            VirtualUser:ClickButton2(Vector2.new())
+            task.wait(60)
+        else
+            task.wait(1)
+        end
     end
 end)
 
-local hue = 0
-RunService.Heartbeat:Connect(function(dt)
-    if Config.rainbow then
-        hue = (hue + dt * 0.3) % 1
-        local cor = Color3.fromHSV(hue, 1, 1)
-        header.BackgroundColor3 = cor
-        bordaPainel.Color = cor
-    else
-        header.BackgroundColor3 = Cores.azul
-        bordaPainel.Color = Cores.azul
+-- Auto Equip Weapon
+task.spawn(function()
+    while gui.Parent do
+        if Config.autoEquipWeapon and (Config.autoFarmLevel or Config.autoFarmBoss or Config.fastAttack) then
+            local char = LocalPlayer.Character
+            if char and not char:FindFirstChildOfClass("Tool") then
+                equiparArma()
+            end
+        end
+        task.wait(1)
     end
 end)
 
-notificar("BF4X", "Carregado! Sea " .. MAR, "sucesso")
-print("[BF4X] v4.0 carregado! Sea " .. MAR)
+-- Auto Farm Level
+task.spawn(function()
+    while gui.Parent do
+        if Config.autoFarmLevel then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
+                if char.Humanoid.Health > 0 then
+                    local mob = getClosestMob()
+                    if mob and mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 then
+                        local mobPos = mob.HumanoidRootPart.Position
+                        local charPos = char.HumanoidRootPart.Position
+                        local dist = (mobPos - charPos).Magnitude
+                        
+                        if dist > 8 then
+                            local dir = (charPos - mobPos).Unit
+                            local targetPos = mobPos + dir * 6 + Vector3.new(0, 3, 0)
+                            local tweenTime = math.min(dist / 200, 1)
+                            local tween = TweenService:Create(char.HumanoidRootPart, TweenInfo.new(tweenTime, Enum.EasingStyle.Linear), {
+                                CFrame = CFrame.new(targetPos, mobPos)
+                            })
+                            tween:Play()
+                            tween.Completed:Wait()
+                        end
+                        
+                        local tool = char:FindFirstChildOfClass("Tool")
+                        if tool then
+                            pcall(function() tool:Activate() end)
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(0.05)
+    end
+end)
+
+-- Auto Farm Boss
+task.spawn(function()
+    while gui.Parent do
+        if Config.autoFarmBoss then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
+                if char.Humanoid.Health > 0 then
+                    local mob = getClosestMob(Config.selectedBoss)
+                    if mob and mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 then
+                        local mobPos = mob.HumanoidRootPart.Position
+                        local charPos = char.HumanoidRootPart.Position
+                        local dist = (mobPos - charPos).Magnitude
+                        
+                        if dist > 8 then
+                            local dir = (charPos - mobPos).Unit
+                            local targetPos = mobPos + dir * 6 + Vector3.new(0, 3, 0)
+                            local tweenTime = math.min(dist / 200, 1)
+                            local tween = TweenService:Create(char.HumanoidRootPart, TweenInfo.new(tweenTime, Enum.EasingStyle.Linear), {
+                                CFrame = CFrame.new(targetPos, mobPos)
+                            })
+                            tween:Play()
+                            tween.Completed:Wait()
+                        end
+                        
+                        local tool = char:FindFirstChildOfClass("Tool")
+                        if tool then
+                            pcall(function() tool:Activate() end)
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(0.05)
+    end
+end)
+
+-- Fast Attack
+task.spawn(function()
+    while gui.Parent do
+        if Config.fastAttack then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") and char.Humanoid.Health > 0 then
+                local tool = char:FindFirstChildOfClass("Tool")
+                if tool then
+                    pcall(function() tool:Activate() end)
+                end
+            end
+        end
+        task.wait(Config.attackDelay or 0.1)
+    end
+end)
+
+-- Mob Aura
+task.spawn(function()
+    while gui.Parent do
+        if Config.mobAura then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                for _, mob in ipairs(workspace:GetDescendants()) do
+                    if mob:IsA("Model") and mob:FindFirstChild("Humanoid") and mob:FindFirstChild("HumanoidRootPart") then
+                        if mob ~= char and not Players:GetPlayerFromCharacter(mob) then
+                            local hum = mob:FindFirstChild("Humanoid")
+                            if hum and hum.Health > 0 then
+                                local dist = (mob.HumanoidRootPart.Position - char.HumanoidRootPart.Position).Magnitude
+                                if dist < Config.distanciaFarm then
+                                    mob.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(0.1)
+    end
+end)
+
+-- Auto Haki
+task.spawn(function()
+    while gui.Parent do
+        if Config.autoHaki then
+            local char = LocalPlayer.Character
+            if char then
+                local haki = char:FindFirstChild("Haki")
+                if haki then pcall(function() haki:Activate() end) end
+                local buso = char:FindFirstChild("Buso")
+                if buso then pcall(function() buso:Activate() end) end
+            end
+        end
+        task.wait(1)
+    end
+end)
+
+-- Auto Chest
+task.spawn(function()
+    while gui.Parent do
+        if Config.autoChest then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local chest = getClosestChest()
+                if chest then
+                    local hrp = chest:FindFirstChild("HumanoidRootPart") or chest:FindFirstChild("Handle")
+                    if hrp then
+                        voarAte(hrp.Position)
+                    end
+                end
+            end
+        end
+        task.wait(0.5)
+    end
+end)
+
+-- Fruit Sniper
+task.spawn(function()
+    while gui.Parent do
+        if Config.fruitSniper then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local fruit = getClosestFruit()
+                if fruit and fruit:FindFirstChild("Handle") then
+                    voarAte(fruit.Handle.Position)
+                    notificar("Fruit Sniper", "Fruta encontrada!", "sucesso")
+                end
+            end
+        end
+        task.wait(0.5)
+    end
+end)
+
+-- Fly
+task.spawn(function()
+    while gui.Parent do
+        if Config.fly then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local hrp = char.HumanoidRootPart
+                local dir = Vector3.new(0, 0, 0)
+                if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + Camera.CFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - Camera.CFrame.LookVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.A) then dir = dir - Camera.CFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + Camera.CFrame.RightVector end
+                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then dir = dir + Vector3.new(0, 1, 0) end
+                if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then dir = dir - Vector3.new(0, 1, 0) end
+                if dir.Magnitude > 0 then dir = dir.Unit * 60 end
+                hrp.Velocity = dir
+            end
+        end
+        task.wait(0.05)
+    end
+end)
+
+-- Noclip
+task.spawn(function()
+    while gui.Parent do
+        if Config.noclip then
+            local char = LocalPlayer.Character
+            if char then
+                for _, p in ipairs(char:GetDescendants()) do
+                    if p:IsA("BasePart") then p.CanCollide = false end
+                end
+            end
+        end
+        task.wait(0.1)
+    end
+end)
+
+-- Walk on Water
+task.spawn(function()
+    while gui.Parent do
+        if Config.waterWalk then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local hrp = char.HumanoidRootPart
+                local ray = Ray.new(hrp.Position, Vector3.new(0, -10, 0))
+                local hit, pos = workspace:FindPartOnRay(ray, char)
+                if hit and hit.Material == Enum.Material.Water then
+                    hrp.CFrame = CFrame.new(pos + Vector3.new(0, 3, 0))
+                end
+            end
+        end
+        task.wait(0.1)
+    end
+end)
+
+-- Infinite Jump
+UserInputService.JumpRequest:Connect(function()
+    if Config.infiniteJump then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end)
+
+notificar("BF4X Premium", "v9.0 carregado! Sea " .. MAR, "sucesso")
+print("[BF4X] Premium v9.0 carregado! Sea " .. MAR)
+print("[BF4X] Key: BF4X-PREMIUM-2026")
