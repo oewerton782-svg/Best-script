@@ -593,7 +593,6 @@ ESPBtn.MouseButton1Click:Connect(function()
 end)
 
 FlyBtn.MouseButton1Click:Connect(function()
-    ToggleFFlyBtn.MouseButton1Click:Connect(function()
     ToggleFly(not FlyEnabled)
     FlyBtn.Text = FlyEnabled and "Fly ON" or "Fly OFF"
     FlyBtn.BackgroundColor3 = FlyEnabled and Color3.fromRGB(50, 180, 50) or Color3.fromRGB(180, 50, 50)
