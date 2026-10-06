@@ -1,3 +1,10 @@
+--[[
+    BF4X Premium - Blox Fruits Script
+    Versao: 10.0
+    Feito por Ewerton
+]]
+
+-- Serviços
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
@@ -8,6 +15,7 @@ local Camera = workspace.CurrentCamera
 local HttpService = game:GetService("HttpService")
 local VirtualUser = game:GetService("VirtualUser")
 local TeleportService = game:GetService("TeleportService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
@@ -146,10 +154,7 @@ local Config = {
     mobAura = false,
     autoHaki = false,
     autoEquipWeapon = true,
-    selectedWeaponType = "Sword", -- Melee, Sword, Blox Fruit, Gun
-    espPlayers = false,
-    espFruits = false,
-    espChests = false,
+    selectedWeaponType = "Sword",
     speed = false,
     fly = false,
     noclip = false,
@@ -161,12 +166,13 @@ local Config = {
     antiAFK = true,
     distanciaFarm = 100,
     attackDelay = 0.1,
-    farmPosition = "Front",
+    speedValue = 100,
+    flySpeed = 60,
     selectedBoss = "Diamond",
     scanRadius = 500
 }
 
--- ============ CORES (REDZ HUB STYLE) ============
+-- ============ CORES ============
 local Cores = {
     fundo = Color3.fromRGB(13, 8, 24),
     painel = Color3.fromRGB(20, 12, 35),
@@ -461,7 +467,7 @@ local vTxt = Instance.new("TextLabel")
 vTxt.Size = UDim2.new(0, 80, 1, 0)
 vTxt.Position = UDim2.new(1, -90, 0, 0)
 vTxt.BackgroundTransparency = 1
-vTxt.Text = "v9.0"
+vTxt.Text = "v10.0"
 vTxt.TextColor3 = Cores.cinzaEscuro
 vTxt.TextSize = 11
 vTxt.Font = Enum.Font.Gotham
@@ -991,9 +997,9 @@ local function equiparArma()
     
     local tipo = Config.selectedWeaponType
     local prioridades = {
-        ["Sword"] = {"sword", "katana", "blade", "cutlass", "saber", "dark", "dragon", "trident", "cursed", "pipe"},
-        ["Melee"] = {"combat", "black leg", "electro", "fishman karate", "dragon claw", "superhuman", "death step", "sharkman karate"},
-        ["Gun"] = {"gun", "pistol", "rifle", "shotgun", "smg", "sniper", "bazooka", "cannon"},
+        ["Sword"] = {"sword", "katana", "blade", "cutlass", "saber", "dark", "dragon", "trident", "cursed", "pipe", "bisento", "sharkman"},
+        ["Melee"] = {"combat", "black leg", "electro", "fishman karate", "dragon claw", "superhuman", "death step", "sharkman karate", "godhuman"},
+        ["Gun"] = {"gun", "pistol", "rifle", "shotgun", "smg", "sniper", "bazooka", "cannon", "flintlock", "slingshot"},
         ["Blox Fruit"] = {"fruit", "bomb", "spike", "flame", "ice", "light", "dark", "rubber", "barrier", "magma", "door", "quake", "human", "buddha", "love", "spider", "sound", "phoenix", "portal", "rumble", "pain", "blizzard", "gravity", "mammoth", "gas", "t-rex", "dough", "shadow", "venom", "control", "spirit", "dragon", "kitsune", "leopard"}
     }
     
@@ -1016,6 +1022,40 @@ local function equiparArma()
             item.Parent = char
             return
         end
+    end
+end
+
+-- Função para pegar missão ativa do Quest GUI
+local function getQuestMob()
+    local questGui = LocalPlayer.PlayerGui:FindFirstChild("Main")
+    if not questGui then return nil end
+    local questFrame = questGui:FindFirstChild("Quest")
+    if not questFrame or not questFrame.Visible then return nil end
+    local questDesc = questFrame:FindFirstChild("QuestDescription")
+    if not questDesc then return nil end
+    local texto = questDesc.Text
+    -- Tenta vários padrões
+    local mobNome = texto:match("defeat (%w+)") 
+        or texto:match("Derrote (%w+)")
+        or texto:match("(%w+)%s+defeat")
+    return mobNome
+end
+
+-- Função para iniciar missão
+local function startQuest()
+    local questGui = LocalPlayer.PlayerGui:FindFirstChild("Main")
+    if not questGui then return end
+    local quests = questGui:FindFirstChild("Quests")
+    if not quests then return end
+    local quest = quests:FindFirstChild("Quest")
+    if not quest then return end
+    local questName = quest:FindFirstChild("QuestName")
+    if not questName then return end
+    local remotes = ReplicatedStorage:FindFirstChild("Remotes")
+    if remotes then
+        pcall(function()
+            remotes.Comm:InvokeServer("StartQuest", questName.Text)
+        end)
     end
 end
 
@@ -1088,21 +1128,11 @@ local function getClosestFruit()
     return melhor
 end
 
-local function voarAte(pos)
+local function teleportarPara(pos, nome)
     local char = LocalPlayer.Character
     if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-    
-    local hrp = char.HumanoidRootPart
-    local dist = (pos - hrp.Position).Magnitude
-    
-    if dist > 5 then
-        local tweenTime = math.min(dist / 200, 1)
-        local tween = TweenService:Create(hrp, TweenInfo.new(tweenTime, Enum.EasingStyle.Linear), {
-            CFrame = CFrame.new(pos)
-        })
-        tween:Play()
-        tween.Completed:Wait()
-    end
+    char.HumanoidRootPart.CFrame = CFrame.new(pos)
+    notificar("TP", "Indo para " .. nome, "sucesso")
 end
 
 -- ============ ABAS ============
@@ -1117,7 +1147,7 @@ criarToggle(abaFARM, "Fruit Sniper", function(v) Config.fruitSniper = v end)
 
 criarSecao(abaFARM, "⚙ CONFIG FARM")
 criarSlider(abaFARM, "Distancia do Farm", 10, 500, 100, function(v) Config.distanciaFarm = v end)
-criarDropdown(abaFARM, "Farm Position", {"Front", "Above", "Below", "Behind"}, function(v) Config.farmPosition = v end)
+criarDropdown(abaFARM, "Boss Alvo", {"Diamond", "Jeremy", "Fajita", "Don Swan", "Smoke Admiral", "Cursed Captain", "Awakened Ice Admiral", "Tide Keeper"}, function(v) Config.selectedBoss = v end)
 
 -- COMBATE
 local abaCOMBATE = contentAbas["COMBATE"]
@@ -1183,8 +1213,7 @@ criarSecao(abaTP, "🌐 ILHAS - SEA " .. MAR)
 local ilhasAtuais = ilhasPorMar[MAR] or ilhasPorMar[2]
 for _, ilha in ipairs(ilhasAtuais) do
     criarBotao(abaTP, "📍 " .. ilha.nome, function()
-        voarAte(ilha.pos)
-        notificar("TP", "Indo para " .. ilha.nome, "sucesso")
+        teleportarPara(ilha.pos, ilha.nome)
     end)
 end
 
@@ -1229,8 +1258,7 @@ criarSecao(abaTP, "👹 BOSSES")
 local bossesAtuais = bossesPorMar[MAR] or bossesPorMar[2]
 for _, boss in ipairs(bossesAtuais) do
     criarBotao(abaTP, "👹 " .. boss.nome, function()
-        voarAte(boss.pos)
-        notificar("TP", "Indo para " .. boss.nome, "sucesso")
+        teleportarPara(boss.pos, boss.nome)
     end)
 end
 
@@ -1240,7 +1268,7 @@ criarSecao(abaESP, "👁 ESP")
 criarToggle(abaESP, "ESP Players", function(v) Config.espPlayers = v end)
 criarToggle(abaESP, "ESP Frutas", function(v) Config.espFruits = v end)
 criarToggle(abaESP, "ESP Chests", function(v) Config.espChests = v end)
-criarLabel(abaESP, "ESP está em desenvolvimento", Cores.cinza)
+criarLabel(abaESP, "ESP em desenvolvimento", Cores.cinza)
 
 -- MOVE
 local abaMOVE = contentAbas["MOVE"]
@@ -1249,10 +1277,20 @@ criarToggle(abaMOVE, "Speed", function(v)
     Config.speed = v
     local char = LocalPlayer.Character
     if char and char:FindFirstChild("Humanoid") then
-        char.Humanoid.WalkSpeed = v and 100 or 16
+        char.Humanoid.WalkSpeed = v and Config.speedValue or 16
+    end
+end)
+criarSlider(abaMOVE, "Speed Value", 16, 300, 100, function(v)
+    Config.speedValue = v
+    if Config.speed then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid.WalkSpeed = v
+        end
     end
 end)
 criarToggle(abaMOVE, "Fly", function(v) Config.fly = v end)
+criarSlider(abaMOVE, "Fly Speed", 20, 300, 60, function(v) Config.flySpeed = v end)
 criarToggle(abaMOVE, "Noclip", function(v) Config.noclip = v end)
 criarToggle(abaMOVE, "Infinite Jump", function(v) Config.infiniteJump = v end)
 criarToggle(abaMOVE, "Walk on Water", function(v) Config.waterWalk = v end)
@@ -1303,7 +1341,7 @@ criarSecao(abaCFG, "⚙ CONFIGURACOES")
 criarToggle(abaCFG, "Notificações", function(v) Config.notificacoes = v end, true)
 criarToggle(abaCFG, "Modo Rainbow", function(v) Config.rainbow = v end)
 criarToggle(abaCFG, "Anti-AFK", function(v) Config.antiAFK = v end, true)
-criarLabel(abaCFG, "BF4X Premium v9.0\nKey: BF4X-PREMIUM-2026\nFeito por Ewerton", Cores.roxoClaro)
+criarLabel(abaCFG, "BF4X Premium v10.0\nKey: BF4X-PREMIUM-2026\nFeito por Ewerton", Cores.roxoClaro)
 
 -- ============ LOOPS ============
 
@@ -1333,39 +1371,40 @@ task.spawn(function()
     end
 end)
 
--- Auto Farm Level
+-- Auto Farm Level (COM SISTEMA DE QUEST)
 task.spawn(function()
     while gui.Parent do
         if Config.autoFarmLevel then
             local char = LocalPlayer.Character
             if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
                 if char.Humanoid.Health > 0 then
-                    local mob = getClosestMob()
-                    if mob and mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 then
-                        local mobPos = mob.HumanoidRootPart.Position
-                        local charPos = char.HumanoidRootPart.Position
-                        local dist = (mobPos - charPos).Magnitude
-                        
-                        if dist > 8 then
-                            local dir = (charPos - mobPos).Unit
-                            local targetPos = mobPos + dir * 6 + Vector3.new(0, 3, 0)
-                            local tweenTime = math.min(dist / 200, 1)
-                            local tween = TweenService:Create(char.HumanoidRootPart, TweenInfo.new(tweenTime, Enum.EasingStyle.Linear), {
-                                CFrame = CFrame.new(targetPos, mobPos)
-                            })
-                            tween:Play()
-                            tween.Completed:Wait()
+                    local mobNome = getQuestMob()
+                    
+                    if mobNome then
+                        local mob = getClosestMob(mobNome)
+                        if mob and mob:FindFirstChild("Humanoid") and mob.Humanoid.Health > 0 then
+                            local mobPos = mob.HumanoidRootPart.Position
+                            local charPos = char.HumanoidRootPart.Position
+                            local dist = (mobPos - charPos).Magnitude
+                            
+                            if dist > 8 then
+                                local dir = (charPos - mobPos).Unit
+                                local targetPos = mobPos + dir * 6 + Vector3.new(0, 3, 0)
+                                char.HumanoidRootPart.CFrame = CFrame.new(targetPos, mobPos)
+                            end
+                            
+                            local tool = char:FindFirstChildOfClass("Tool")
+                            if tool then
+                                pcall(function() tool:Activate() end)
+                            end
                         end
-                        
-                        local tool = char:FindFirstChildOfClass("Tool")
-                        if tool then
-                            pcall(function() tool:Activate() end)
-                        end
+                    else
+                        startQuest()
                     end
                 end
             end
         end
-        task.wait(0.05)
+        task.wait(0.1)
     end
 end)
 
@@ -1385,12 +1424,7 @@ task.spawn(function()
                         if dist > 8 then
                             local dir = (charPos - mobPos).Unit
                             local targetPos = mobPos + dir * 6 + Vector3.new(0, 3, 0)
-                            local tweenTime = math.min(dist / 200, 1)
-                            local tween = TweenService:Create(char.HumanoidRootPart, TweenInfo.new(tweenTime, Enum.EasingStyle.Linear), {
-                                CFrame = CFrame.new(targetPos, mobPos)
-                            })
-                            tween:Play()
-                            tween.Completed:Wait()
+                            char.HumanoidRootPart.CFrame = CFrame.new(targetPos, mobPos)
                         end
                         
                         local tool = char:FindFirstChildOfClass("Tool")
@@ -1401,7 +1435,7 @@ task.spawn(function()
                 end
             end
         end
-        task.wait(0.05)
+        task.wait(0.1)
     end
 end)
 
@@ -1472,7 +1506,7 @@ task.spawn(function()
                 if chest then
                     local hrp = chest:FindFirstChild("HumanoidRootPart") or chest:FindFirstChild("Handle")
                     if hrp then
-                        voarAte(hrp.Position)
+                        char.HumanoidRootPart.CFrame = CFrame.new(hrp.Position)
                     end
                 end
             end
@@ -1489,7 +1523,7 @@ task.spawn(function()
             if char and char:FindFirstChild("HumanoidRootPart") then
                 local fruit = getClosestFruit()
                 if fruit and fruit:FindFirstChild("Handle") then
-                    voarAte(fruit.Handle.Position)
+                    char.HumanoidRootPart.CFrame = CFrame.new(fruit.Handle.Position)
                     notificar("Fruit Sniper", "Fruta encontrada!", "sucesso")
                 end
             end
@@ -1498,13 +1532,34 @@ task.spawn(function()
     end
 end)
 
--- Fly
+-- Speed (forçado continuamente)
+task.spawn(function()
+    while gui.Parent do
+        if Config.speed then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.WalkSpeed = Config.speedValue
+            end
+        end
+        task.wait(0.1)
+    end
+end)
+
+-- Fly (com BodyVelocity)
 task.spawn(function()
     while gui.Parent do
         if Config.fly then
             local char = LocalPlayer.Character
             if char and char:FindFirstChild("HumanoidRootPart") then
                 local hrp = char.HumanoidRootPart
+                local bv = hrp:FindFirstChild("BF4X_Fly")
+                if not bv then
+                    bv = Instance.new("BodyVelocity")
+                    bv.Name = "BF4X_Fly"
+                    bv.MaxForce = Vector3.new(1e5, 1e5, 1e5)
+                    bv.Parent = hrp
+                end
+                
                 local dir = Vector3.new(0, 0, 0)
                 if UserInputService:IsKeyDown(Enum.KeyCode.W) then dir = dir + Camera.CFrame.LookVector end
                 if UserInputService:IsKeyDown(Enum.KeyCode.S) then dir = dir - Camera.CFrame.LookVector end
@@ -1512,8 +1567,18 @@ task.spawn(function()
                 if UserInputService:IsKeyDown(Enum.KeyCode.D) then dir = dir + Camera.CFrame.RightVector end
                 if UserInputService:IsKeyDown(Enum.KeyCode.Space) then dir = dir + Vector3.new(0, 1, 0) end
                 if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then dir = dir - Vector3.new(0, 1, 0) end
-                if dir.Magnitude > 0 then dir = dir.Unit * 60 end
-                hrp.Velocity = dir
+                
+                if dir.Magnitude > 0 then
+                    bv.Velocity = dir.Unit * Config.flySpeed
+                else
+                    bv.Velocity = Vector3.new(0, 0, 0)
+                end
+            end
+        else
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local bv = char.HumanoidRootPart:FindFirstChild("BF4X_Fly")
+                if bv then bv:Destroy() end
             end
         end
         task.wait(0.05)
@@ -1563,6 +1628,6 @@ UserInputService.JumpRequest:Connect(function()
     end
 end)
 
-notificar("BF4X Premium", "v9.0 carregado! Sea " .. MAR, "sucesso")
-print("[BF4X] Premium v9.0 carregado! Sea " .. MAR)
+notificar("BF4X Premium", "v10.0 carregado! Sea " .. MAR, "sucesso")
+print("[BF4X] Premium v10.0 carregado! Sea " .. MAR)
 print("[BF4X] Key: BF4X-PREMIUM-2026")
